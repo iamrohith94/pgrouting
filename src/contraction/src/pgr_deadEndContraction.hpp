@@ -150,11 +150,11 @@ class Pgr_deadEndContraction {
             if (graph.out_degree(v) == 0 && graph.in_degree(v) > 0) {
                 return true;
              }
-             /*  dead start
+             //  dead start
              if (graph.in_degree(v) == 0 && graph.out_degree(v) > 0) {
                 return true;
              }
-             */
+             
             debug << "No\n";
             return false;
         }
