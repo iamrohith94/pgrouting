@@ -43,7 +43,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  *  - should allways be first in the C code
  */
-#include "./../../common/src/postgres_connection.h"
+#include "./../../../include/c_common/postgres_connection.h"
 
 /**
  *  funcapi.h
@@ -67,12 +67,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #include "fmgr.h"
 
 #include "utils/array.h"
-#include "./../../common/src/debug_macro.h" // for macro PGR_DBG
-#include "./../../common/src/e_report.h"  // for pgr_global_report
-#include "./../../common/src/time_msg.h"  // for time_msg & clock
-#include "./../../common/src/pgr_types.h"  // for the current accepted types
-#include "./../../common/src/edges_input.h" // for functions to get edges informtion
-#include "./../../common/src/arrays_input.h"
+#include "c_common/debug_macro.h" // for macro PGR_DBG
+#include "c_common/e_report.h"  // for pgr_global_report
+#include "c_types/pgr_time_analysis_t.h"  // for time_msg & clock
+#include "c_common/time_msg.h"  // for the current accepted types
+#include "c_common/edges_input.h" // for functions to get edges informtion
+#include "c_common/arrays_input.h"
 
 #include "./timeAnalysis_driver.h"  // the C++ code of the function
 
