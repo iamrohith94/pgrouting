@@ -43,7 +43,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  *  - should allways be first in the C code
  */
-#include "./../../../include/c_common/postgres_connection.h"
+#include "c_common/postgres_connection.h"
 
 /**
  *  funcapi.h
@@ -89,6 +89,7 @@ process(
         char* algorithm,
         ArrayType *start_vids,
         ArrayType *end_vids,
+        size_t num_iterations,
         bool directed,
         bool only_cost,
         pgr_time_analysis_t **result_tuples,
@@ -138,6 +139,7 @@ process(
             size_start_vidsArr,
             end_vidsArr,
             size_end_vidsArr,
+            num_iterations,
             directed,
             only_cost,
             result_tuples,
@@ -158,14 +160,10 @@ process(
     if (log_msg) pfree(log_msg);
     if (notice_msg) pfree(notice_msg);
     if (err_msg) pfree(err_msg);
-#if 0
-    /*
-     *  handling arrays example
-     */
 
     if (end_vidsArr) pfree(end_vidsArr);
     if (start_vidsArr) pfree(start_vidsArr);
-#endif
+
 
     pgr_SPI_finish();
 }
@@ -206,10 +204,11 @@ PGDLLEXPORT Datum timeAnalysis(PG_FUNCTION_ARGS) {
         process(
                 text_to_cstring(PG_GETARG_TEXT_P(0)),
                 text_to_cstring(PG_GETARG_TEXT_P(1)),
-                PG_GETARG_ARRAYTYPE_P(1),
                 PG_GETARG_ARRAYTYPE_P(2),
-                PG_GETARG_BOOL(3),
-                PG_GETARG_BOOL(4),
+                PG_GETARG_ARRAYTYPE_P(3),
+                PG_GETARG_INT32(4),
+                PG_GETARG_BOOL(5),
+                PG_GETARG_BOOL(6),
                 &result_tuples,
                 &result_count);
 
@@ -254,21 +253,20 @@ PGDLLEXPORT Datum timeAnalysis(PG_FUNCTION_ARGS) {
     OUT time_taken FLOAT
          ***********************************************************************/
 
-        values = palloc(6 * sizeof(Datum));
-        nulls = palloc(6 * sizeof(bool));
+        values = palloc(4 * sizeof(Datum));
+        nulls = palloc(4 * sizeof(bool));
 
 
         size_t i;
-        for (i = 0; i < 6; ++i) {
+        for (i = 0; i < 4; ++i) {
             nulls[i] = false;
         }
 
         // postgres starts counting from 1
         values[0] = Int32GetDatum(funcctx->call_cntr + 1);
-        values[1] = Int32GetDatum(result_tuples[funcctx->call_cntr].seq);
-        values[2] = Int64GetDatum(result_tuples[funcctx->call_cntr].source);
-        values[3] = Int64GetDatum(result_tuples[funcctx->call_cntr].target);
-        values[4] = Float8GetDatum(result_tuples[funcctx->call_cntr].time_taken);
+        values[1] = Int64GetDatum(result_tuples[funcctx->call_cntr].source);
+        values[2] = Int64GetDatum(result_tuples[funcctx->call_cntr].target);
+        values[3] = Float8GetDatum(result_tuples[funcctx->call_cntr].avg_time);
         /**********************************************************************/
 
         tuple = heap_form_tuple(tuple_desc, values, nulls);

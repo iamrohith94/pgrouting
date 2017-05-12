@@ -32,12 +32,13 @@ CREATE OR REPLACE FUNCTION pgr_timeAnalysis(
     algorithm TEXT,
  	start_vids ANYARRAY,
     end_vids ANYARRAY,
+    num_iterations INTEGER DEFAULT 5,
     directed BOOLEAN DEFAULT true,
     only_cost BOOLEAN DEFAULT false,
     OUT seq INTEGER,
     OUT source BIGINT,
     OUT target BIGINT,
-    OUT time_taken FLOAT)
+    OUT avg_time FLOAT)
 
 RETURNS SETOF RECORD AS
 '$libdir/${PGROUTING_LIBRARY_NAME}', 'timeAnalysis'

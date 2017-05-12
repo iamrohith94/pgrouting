@@ -60,6 +60,7 @@ pgr_timeAnalysis(
         G &graph,
         std::vector<int64_t> sources,
         std::vector<int64_t> targets,
+        size_t num_iterations,
         bool only_cost = false) {
     Path path;
     Pgr_dijkstra< G > fn_dijkstra;
@@ -77,13 +78,20 @@ pgr_timeAnalysis(
             std::unique(targets.begin(), targets.end()),
             targets.end());
 
-    for (int i = 0; i < sizeof(sources); ++i) {
+
+
+
+    for (size_t i = 0; i < sources.size(); ++i) {
         temp.source = sources[i];
         temp.target = targets[i];
-        start_t = clock();
-        fn_dijkstra.dijkstra(graph, sources[i], targets[i], only_cost);
-        end_t = clock();
-        temp.time_taken = 1000.0 * (end_t-start_t) / CLOCKS_PER_SEC;
+        temp.avg_time = 0.0000;
+        for (size_t j = 0; j < num_iterations; ++j) {
+            start_t = clock();
+            fn_dijkstra.dijkstra(graph, sources[i], targets[i], only_cost);
+            end_t = clock();
+            temp.avg_time += (double)(1000.0 * (end_t-start_t) / CLOCKS_PER_SEC);
+        }
+        temp.avg_time /= num_iterations;
         return_tuples.push_back(temp);
     }
     return return_tuples;
@@ -98,6 +106,7 @@ do_pgr_timeAnalysis(
         size_t size_start_vidsArr,
         int64_t* end_vidsArr,
         size_t size_end_vidsArr,
+        size_t num_iterations,
         bool directed,
         bool only_cost,
         pgr_time_analysis_t **return_tuples,
@@ -118,11 +127,24 @@ do_pgr_timeAnalysis(
 
         graphType gType = directed? DIRECTED: UNDIRECTED;
 
+        log << "Size of start_vertices: " << size_start_vidsArr << std::endl;
+        log << "Start vertices" << std::endl;
+        for (size_t i = 0; i < size_start_vidsArr; ++i) {
+            log << start_vidsArr[i] << std::endl;
+        }
+        log << "Size of end_vertices: " << size_end_vidsArr << std::endl;
+        log << "End vertices" << std::endl;
+        for (size_t i = 0; i < size_end_vidsArr; ++i) {
+            log << end_vidsArr[i] << std::endl;
+        }
         log << "Inserting vertices into a c++ vector structure";
         std::vector<int64_t>
-            start_vertices(start_vidsArr, start_vidsArr + size_start_vidsArr);
-        std::vector< int64_t >
-            end_vertices(end_vidsArr, end_vidsArr + size_end_vidsArr);
+        start_vertices(start_vidsArr, start_vidsArr + size_start_vidsArr);
+        std::vector<int64_t>
+        end_vertices(end_vidsArr, end_vidsArr + size_end_vidsArr);
+
+        log << "Size of start_vertices: " << start_vertices.size() << std::endl;
+        log << "Size of end_vertices: " << end_vertices.size() << std::endl;
 
         std::deque< pgr_time_analysis_t > time_analysis;
         std::deque< pgr_time_analysis_t >::iterator it;
@@ -134,6 +156,7 @@ do_pgr_timeAnalysis(
             time_analysis = pgr_timeAnalysis(digraph,
                     start_vertices,
                     end_vertices,
+                    num_iterations,
                     only_cost);
         } else {
             log << "Working with Undirected Graph\n";
@@ -143,6 +166,7 @@ do_pgr_timeAnalysis(
                     undigraph,
                     start_vertices,
                     end_vertices,
+                    num_iterations,
                     only_cost);
         }
 
