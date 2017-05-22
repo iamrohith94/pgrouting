@@ -253,12 +253,12 @@ PGDLLEXPORT Datum timeAnalysis(PG_FUNCTION_ARGS) {
     OUT time_taken FLOAT
          ***********************************************************************/
 
-        values = palloc(4 * sizeof(Datum));
-        nulls = palloc(4 * sizeof(bool));
+        values = palloc(5 * sizeof(Datum));
+        nulls = palloc(5 * sizeof(bool));
 
 
         size_t i;
-        for (i = 0; i < 4; ++i) {
+        for (i = 0; i < 5; ++i) {
             nulls[i] = false;
         }
 
@@ -266,7 +266,8 @@ PGDLLEXPORT Datum timeAnalysis(PG_FUNCTION_ARGS) {
         values[0] = Int32GetDatum(funcctx->call_cntr + 1);
         values[1] = Int64GetDatum(result_tuples[funcctx->call_cntr].source);
         values[2] = Int64GetDatum(result_tuples[funcctx->call_cntr].target);
-        values[3] = Float8GetDatum(result_tuples[funcctx->call_cntr].avg_time);
+        values[3] = Float8GetDatum(result_tuples[funcctx->call_cntr].build_time);
+        values[4] = Float8GetDatum(result_tuples[funcctx->call_cntr].avg_execution_time);
         /**********************************************************************/
 
         tuple = heap_form_tuple(tuple_desc, values, nulls);

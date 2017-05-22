@@ -58,7 +58,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 typedef struct {
     int64_t source;
     int64_t target;
-    double avg_time;
+    double build_time;
+    double avg_execution_time;
+
 } pgr_time_analysis_t;
 
 #endif  // INCLUDE_C_TYPES_PGR_TIME_ANALYSIS_T_H_

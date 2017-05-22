@@ -38,7 +38,8 @@ CREATE OR REPLACE FUNCTION pgr_timeAnalysis(
     OUT seq INTEGER,
     OUT source BIGINT,
     OUT target BIGINT,
-    OUT avg_time FLOAT)
+    OUT build_time FLOAT,
+    OUT avg_execution_time FLOAT)
 
 RETURNS SETOF RECORD AS
 '$libdir/${PGROUTING_LIBRARY_NAME}', 'timeAnalysis'
