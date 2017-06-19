@@ -69,15 +69,16 @@ pgr_timeAnalysis(
     std::deque< pgr_time_analysis_t > return_tuples;
     pgr_time_analysis_t temp;
 
-    //std::sort(sources.begin(), sources.end());
+    /*std::sort(sources.begin(), sources.end());
     sources.erase(
             std::unique(sources.begin(), sources.end()),
             sources.end());
 
-    //std::sort(targets.begin(), targets.end());
+    std::sort(targets.begin(), targets.end());
     targets.erase(
             std::unique(targets.begin(), targets.end()),
             targets.end());
+    */
 
     temp.build_time = build_time;
     for (size_t i = 0; i < sources.size(); ++i) {
