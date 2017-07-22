@@ -4,8 +4,7 @@ CREATE OR REPLACE FUNCTION pgr_areaContraction(
     boundary_vids ANYARRAY,
     directed BOOLEAN DEFAULT true,
 
-    OUT seq INTEGER,
-    OUT id INTEGER,
+    OUT id BIGINT,
     OUT source BIGINT,
     OUT target BIGINT,
     OUT cost FLOAT)
@@ -18,7 +17,7 @@ DECLARE
   final_query TEXT;
 BEGIN
     paths_query := 'SELECT * FROM pgr_dijkstra(' || quote_literal(edges_sql) || ', ' || 
-    boundary_vids || ', ' || boundary_vids || ', ' || directed || ') WHERE edge != -1';
+    quote_literal(boundary_vids) || '::BIGINT[]' || ', ' || quote_literal(boundary_vids) || '::BIGINT[]' || ', ' || directed || ') WHERE edge != -1';
     groupby_query := 'SELECT edge as id, node as source, cost FROM a GROUP BY id, source, cost';
     join_query := 'SELECT b.id AS id, b.source AS source,
     CASE WHEN c.source = b.source THEN c.target 
