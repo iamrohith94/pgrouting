@@ -1,6 +1,7 @@
 
 SET(LOCAL_FILES
     contractGraph.sql
+    areaContraction.sql
     )
 
 foreach (f ${LOCAL_FILES})
