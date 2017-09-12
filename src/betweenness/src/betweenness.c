@@ -67,15 +67,7 @@ static
 void
 process(
         char* edges_sql,
-        int64_t start_vid,
-        int64_t end_vid,
-#if 0
-        /*
-         * handling arrays example
-         */
-        ArrayType *starts,
-        ArrayType *ends,
-#endif
+        bool is_parallel,
         bool directed,
         bool only_cost,
         General_path_element_t **result_tuples,
@@ -137,17 +129,7 @@ process(
     do_pgr_betweenness(
             edges,
             total_edges,
-            start_vid,
-            end_vid,
-#if 0
-    /*
-     *  handling arrays example
-     */
-
-            start_vidsArr, size_start_vidsArr,
-            end_vidsArr, size_end_vidsArr,
-#endif
-
+            is_parallel,
             directed,
             only_cost,
             result_tuples,
@@ -214,18 +196,9 @@ PGDLLEXPORT Datum betweenness(PG_FUNCTION_ARGS) {
         PGR_DBG("Calling process");
         process(
                 text_to_cstring(PG_GETARG_TEXT_P(0)),
-                PG_GETARG_INT64(1),
-                PG_GETARG_INT64(2),
-#if 0
-                /*
-                 *  handling arrays example
-                 */
-
-                PG_GETARG_ARRAYTYPE_P(1),
-                PG_GETARG_ARRAYTYPE_P(2),
-#endif
+                PG_GETARG_BOOL(1),
+                PG_GETARG_BOOL(2),
                 PG_GETARG_BOOL(3),
-                PG_GETARG_BOOL(4),
                 &result_tuples,
                 &result_count);
 
@@ -253,7 +226,7 @@ PGDLLEXPORT Datum betweenness(PG_FUNCTION_ARGS) {
 
     funcctx = SRF_PERCALL_SETUP();
     tuple_desc = funcctx->tuple_desc;
-    result_tuples = (General_path_element_t*) funcctx->user_fctx;
+    result_tuples = (pgr_betweenness_rt*) funcctx->user_fctx;
 
     if (funcctx->call_cntr < funcctx->max_calls) {
         HeapTuple    tuple;
@@ -284,10 +257,11 @@ PGDLLEXPORT Datum betweenness(PG_FUNCTION_ARGS) {
         // postgres starts counting from 1
         values[0] = Int32GetDatum(funcctx->call_cntr + 1);
         values[1] = Int32GetDatum(result_tuples[funcctx->call_cntr].seq);
-        values[2] = Int64GetDatum(result_tuples[funcctx->call_cntr].node);
-        values[3] = Int64GetDatum(result_tuples[funcctx->call_cntr].edge);
-        values[4] = Float8GetDatum(result_tuples[funcctx->call_cntr].cost);
-        values[5] = Float8GetDatum(result_tuples[funcctx->call_cntr].agg_cost);
+        values[2] = Int64GetDatum(result_tuples[funcctx->call_cntr].edge);
+        values[3] = Int64GetDatum(result_tuples[funcctx->call_cntr].source);
+        values[4] = Int64GetDatum(result_tuples[funcctx->call_cntr].target);
+        values[5] = Int64GetDatum(result_tuples[funcctx->call_cntr].cost);
+        values[6] = Float8GetDatum(result_tuples[funcctx->call_cntr].betweenness);
         /**********************************************************************/
 
         tuple = heap_form_tuple(tuple_desc, values, nulls);

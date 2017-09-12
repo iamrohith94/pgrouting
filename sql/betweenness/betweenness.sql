@@ -29,16 +29,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 CREATE OR REPLACE FUNCTION pgr_betweenness(
     TEXT,
-    BIGINT,
-    BIGINT,
+    BOOLEAN,
     directed BOOLEAN DEFAULT true,
     only_cost BOOLEAN DEFAULT false,
-        OUT seq INTEGER,
-    OUT path_seq INTEGER,
-    OUT node BIGINT,
-    OUT edge BIGINT,
+    OUT seq INTEGER,
+    OUT id BIGINT,
+    OUT source BIGINT,
+    OUT target BIGINT,
     OUT cost FLOAT,
-    OUT agg_cost FLOAT)
+    OUT betweenness FLOAT)
 
 RETURNS SETOF RECORD AS
 '$libdir/${PGROUTING_LIBRARY_NAME}', 'betweenness'

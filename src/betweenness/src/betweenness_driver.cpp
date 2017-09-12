@@ -33,7 +33,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #include <deque>
 #include <vector>
 
-#include "dijkstra/pgr_dijkstra.hpp"
+#include "betweenness/pgr_brandes_betweenness.hpp"
 
 #include "cpp_common/pgr_alloc.hpp"
 #include "cpp_common/pgr_assert.h"
@@ -52,27 +52,24 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 template < class G >
 static
-Path
+std::vector<pgr_betweenness_rt>
 pgr_betweenness(
         G &graph,
-        int64_t source,
-        int64_t target,
+        bool is_parallel,
         bool only_cost = false) {
-    Path path;
-    Pgr_dijkstra< G > fn_dijkstra;
-    return fn_dijkstra.dijkstra(graph, source, target, only_cost);
+        Pgr_brandes_betweenness< G > fn_betweenness;
+        std::vector<pgr_betweenness_rt>& edge_betweenness;
+        return fn_betweenness.get_edge_betweenness(graph, edge_betweenness, is_parallel);
 }
-
 
 void
 do_pgr_betweenness(
         pgr_edge_t  *data_edges,
         size_t total_edges,
-        int64_t start_vid,
-        int64_t end_vid,
+        bool is_parallel,
         bool directed,
         bool only_cost,
-        General_path_element_t **return_tuples,
+        pgr_betweenness_rt **return_tuples,
         size_t *return_count,
         char ** log_msg,
         char ** notice_msg,
@@ -97,8 +94,7 @@ do_pgr_betweenness(
             pgrouting::DirectedGraph digraph(gType);
             digraph.insert_edges(data_edges, total_edges);
             path = pgr_betweenness(digraph,
-                    start_vid,
-                    end_vid,
+                    is_parallel,
                     only_cost);
         } else {
             log << "Working with Undirected Graph\n";
@@ -106,8 +102,7 @@ do_pgr_betweenness(
             undigraph.insert_edges(data_edges, total_edges);
             path = pgr_betweenness(
                     undigraph,
-                    start_vid,
-                    end_vid,
+                    is_parallel,
                     only_cost);
         }
 
