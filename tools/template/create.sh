@@ -29,9 +29,9 @@ fi
 
 
 #dont put pgr_ on MY_FUNCTION_NAME that is done automatically
-MY_FUNCTION_NAME="funnyDijkstra"
-DEVELOPER_NAME="Celia Virginia Vergara Castillo"
-DEVELOPER_EMAIL="vicky_vergara\@hotmail.com" 
+MY_FUNCTION_NAME="betweenness"
+DEVELOPER_NAME="Rohith Reddy"
+DEVELOPER_EMAIL="rohithreddy2219@gmail.com" 
 YEAR="2017"
 
 # Note: the "\n     " (change line and four spaces) after each comma
