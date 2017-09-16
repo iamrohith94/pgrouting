@@ -51,27 +51,33 @@ public:
 	typedef typename G::V V;
     typedef typename G::E E;
     typedef typename G::B_G B_G;
-    E edge;
     typedef std::map<E, int64_t> StdEdgeIndexMap;
     typedef boost::associative_property_map< StdEdgeIndexMap > EdgeIndexMap;
     typedef typename boost::property_map< B_G, boost::vertex_index_t>::type VertexIndexMap;
 
-    StdEdgeIndexMap my_e_index;
-    EdgeIndexMap e_index;
-
-
-
-
     void get_edge_betweenness(const G &graph, 
-        std::vector<pgr_betweenness_rt>& edges, bool is_parallel) {
+        std::vector<pgr_betweenness_rt>& edges_container, bool is_parallel) {
         if (!is_parallel)
-    		this->edge_betweenness(graph, edges);
+    		this->edge_betweenness(graph, edges_container);
     	else
-    		this->parallel_edge_betweenness(graph, edges);
+    		this->parallel_edge_betweenness(graph, edges_container);
     }
 
     void edge_betweenness(const G &graph,
-    	std::vector<pgr_betweenness_rt>& edges) {
+    	std::vector<pgr_betweenness_rt>& edges_container) {
+
+        StdEdgeIndexMap my_e_index;
+        EdgeIndexMap e_index(my_e_index);   
+
+        int64_t i = 0;
+
+
+        for (auto eit = boost::edges(graph.graph).first; 
+            eit != boost::edges(graph.graph).second; ++eit) {
+            my_e_index.insert(std::pair< E, int64_t >(*eit, i));
+            ++i;
+        }
+
     	// Define EdgeCentralityMap
         std::vector< double > e_centrality_vec(boost::num_edges(graph.graph), 0.0);
         // Create the external property map
@@ -87,21 +93,25 @@ public:
                   v_centrality_map(v_centrality_vec.begin(), v_index);
     	
         //brandes_betweenness_centrality(graph.graph, v_centrality_map, e_centrality_map);
-
-
-        auto es = boost::edges(graph.graph);
-        for (auto eit = es.first; eit != es.second; ++eit) {
+        pgr_betweenness_rt temp;
+        for (auto eit = boost::edges(graph.graph).first; 
+            eit != boost::edges(graph.graph).second; ++eit) {
                //std::cout << boost::source(*eit, g) << ' ' << boost::target(*eit, g) << std::endl;
 
                //std::cout << edge << ": " << e_centrality_map[edge] << std::endl;
-                //edges.push_back({0, graph[*eit].id, 
-                //    graph[*eit].source, graph[*eit].target, graph[*eit].cost, e_centrality_map[*eit]});
+                //temp.seq = 0;
+                temp.id = graph[*eit].id;
+                temp.source = graph[graph.source(*eit)].id;
+                temp.target = graph[graph.target(*eit)].id;
+                temp.cost = graph[*eit].cost;
+                edges_container.push_back(temp);
+                    //, e_centrality_map[*eit]});
            }
     	
     }
 
     void parallel_edge_betweenness(const G &graph,
-    	std::vector<pgr_betweenness_rt>& edges) {
+    	std::vector<pgr_betweenness_rt>& edges_container) {
     	
     }
 };

@@ -32,12 +32,11 @@ CREATE OR REPLACE FUNCTION pgr_betweenness(
     BOOLEAN,
     directed BOOLEAN DEFAULT true,
     only_cost BOOLEAN DEFAULT false,
-    OUT seq INTEGER,
     OUT id BIGINT,
     OUT source BIGINT,
     OUT target BIGINT,
-    OUT cost FLOAT,
-    OUT betweenness FLOAT)
+    OUT cost FLOAT)
+    
 
 RETURNS SETOF RECORD AS
 '$libdir/${PGROUTING_LIBRARY_NAME}', 'betweenness'

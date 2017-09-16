@@ -62,12 +62,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
 typedef struct {
-  int seq; 
   int64_t id;
   int64_t source;
   int64_t target;
   double cost;
-  double betweenness;
+  //double betweenness;
   
 } pgr_betweenness_rt;
 

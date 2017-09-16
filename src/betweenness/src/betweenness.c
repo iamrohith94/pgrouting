@@ -237,23 +237,23 @@ PGDLLEXPORT Datum betweenness(PG_FUNCTION_ARGS) {
     OUT agg_cost FLOAT
          ***********************************************************************/
 
-        values = palloc(7 * sizeof(Datum));
-        nulls = palloc(7 * sizeof(bool));
+        values = palloc(5 * sizeof(Datum));
+        nulls = palloc(5 * sizeof(bool));
 
 
         size_t i;
-        for (i = 0; i < 7; ++i) {
+        for (i = 0; i < 5; ++i) {
             nulls[i] = false;
         }
 
         // postgres starts counting from 1
         values[0] = Int32GetDatum(funcctx->call_cntr + 1);
-        values[1] = Int32GetDatum(result_tuples[funcctx->call_cntr].seq);
-        values[2] = Int64GetDatum(result_tuples[funcctx->call_cntr].id);
-        values[3] = Int64GetDatum(result_tuples[funcctx->call_cntr].source);
-        values[4] = Int64GetDatum(result_tuples[funcctx->call_cntr].target);
-        values[5] = Float8GetDatum(result_tuples[funcctx->call_cntr].cost);
-        values[6] = Float8GetDatum(result_tuples[funcctx->call_cntr].betweenness);
+        //values[1] = Int32GetDatum(result_tuples[funcctx->call_cntr].seq);
+        values[1] = Int64GetDatum(result_tuples[funcctx->call_cntr].id);
+        values[2] = Int64GetDatum(result_tuples[funcctx->call_cntr].source);
+        values[3] = Int64GetDatum(result_tuples[funcctx->call_cntr].target);
+        values[4] = Float8GetDatum(result_tuples[funcctx->call_cntr].cost);
+        //values[6] = Float8GetDatum(result_tuples[funcctx->call_cntr].betweenness);
         /**********************************************************************/
 
         tuple = heap_form_tuple(tuple_desc, values, nulls);
