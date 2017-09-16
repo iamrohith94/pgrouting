@@ -51,14 +51,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  ***********************************************************/
 
 template < class G >
-static
-std::vector<pgr_betweenness_rt>
+void
 pgr_betweenness(
         G &graph,
+        std::vector<pgr_betweenness_rt>& edge_betweenness,
         bool is_parallel,
         bool only_cost = false) {
         Pgr_brandes_betweenness< G > fn_betweenness;
-        std::vector<pgr_betweenness_rt>& edge_betweenness;
         return fn_betweenness.get_edge_betweenness(graph, edge_betweenness, is_parallel);
 }
 
@@ -87,13 +86,14 @@ do_pgr_betweenness(
 
         graphType gType = directed? DIRECTED: UNDIRECTED;
 
-        Path path;
+        std::vector<pgr_betweenness_rt> edge_betweenness;
 
         if (directed) {
             log << "Working with directed Graph\n";
             pgrouting::DirectedGraph digraph(gType);
             digraph.insert_edges(data_edges, total_edges);
             path = pgr_betweenness(digraph,
+                    edge_betweenness,
                     is_parallel,
                     only_cost);
         } else {
@@ -102,11 +102,12 @@ do_pgr_betweenness(
             undigraph.insert_edges(data_edges, total_edges);
             path = pgr_betweenness(
                     undigraph,
+                    edge_betweenness,
                     is_parallel,
                     only_cost);
         }
 
-        auto count = path.size();
+        auto count = edge_betweenness.size();
 
         if (count == 0) {
             (*return_tuples) = NULL;

@@ -85,7 +85,7 @@ public:
     	std::vector<pgr_betweenness_rt>& edge_betweenness) {
     	
     }
-}
+};
 
 
 #endif  // INCLUDE_BETWEENNESS_PGR_BRANDES_BETWEENNESS_HPP_
