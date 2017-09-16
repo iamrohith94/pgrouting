@@ -92,6 +92,7 @@ do_pgr_betweenness(
             log << "Working with directed Graph\n";
             pgrouting::DirectedGraph digraph(gType);
             digraph.insert_edges(data_edges, total_edges);
+            log << digraph;
             /*
             pgr_betweenness(digraph,
                     edge_betweenness,
