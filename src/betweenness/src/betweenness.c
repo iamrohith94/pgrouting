@@ -70,7 +70,7 @@ process(
         bool is_parallel,
         bool directed,
         bool only_cost,
-        General_path_element_t **result_tuples,
+        pgr_betweenness_rt **result_tuples,
         size_t *result_count) {
     /*
      *  https://www.postgresql.org/docs/current/static/spi-spi-connect.html
@@ -103,14 +103,6 @@ process(
     PGR_DBG("Load data");
     pgr_edge_t *edges = NULL;
     size_t total_edges = 0;
-
-    if (start_vid == end_vid) {
-        /*
-         * https://www.postgresql.org/docs/current/static/spi-spi-finish.html
-         */
-        pgr_SPI_finish();
-        return;
-    }
 
     pgr_get_edges(edges_sql, &edges, &total_edges);
     PGR_DBG("Total %ld edges in query:", total_edges);
@@ -171,7 +163,7 @@ PGDLLEXPORT Datum betweenness(PG_FUNCTION_ARGS) {
     /**************************************************************************/
     /*                          MODIFY AS NEEDED                              */
     /*                                                                        */
-    General_path_element_t  *result_tuples = NULL;
+    pgr_betweenness_rt  *result_tuples = NULL;
     size_t result_count = 0;
     /*                                                                        */
     /**************************************************************************/
@@ -245,22 +237,22 @@ PGDLLEXPORT Datum betweenness(PG_FUNCTION_ARGS) {
     OUT agg_cost FLOAT
          ***********************************************************************/
 
-        values = palloc(6 * sizeof(Datum));
-        nulls = palloc(6 * sizeof(bool));
+        values = palloc(7 * sizeof(Datum));
+        nulls = palloc(7 * sizeof(bool));
 
 
         size_t i;
-        for (i = 0; i < 6; ++i) {
+        for (i = 0; i < 7; ++i) {
             nulls[i] = false;
         }
 
         // postgres starts counting from 1
         values[0] = Int32GetDatum(funcctx->call_cntr + 1);
         values[1] = Int32GetDatum(result_tuples[funcctx->call_cntr].seq);
-        values[2] = Int64GetDatum(result_tuples[funcctx->call_cntr].edge);
+        values[2] = Int64GetDatum(result_tuples[funcctx->call_cntr].id);
         values[3] = Int64GetDatum(result_tuples[funcctx->call_cntr].source);
         values[4] = Int64GetDatum(result_tuples[funcctx->call_cntr].target);
-        values[5] = Int64GetDatum(result_tuples[funcctx->call_cntr].cost);
+        values[5] = Float8GetDatum(result_tuples[funcctx->call_cntr].cost);
         values[6] = Float8GetDatum(result_tuples[funcctx->call_cntr].betweenness);
         /**********************************************************************/
 

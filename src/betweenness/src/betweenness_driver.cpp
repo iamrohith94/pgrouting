@@ -58,7 +58,7 @@ pgr_betweenness(
         bool is_parallel,
         bool only_cost = false) {
         Pgr_brandes_betweenness< G > fn_betweenness;
-        return fn_betweenness.get_edge_betweenness(graph, edge_betweenness, is_parallel);
+        fn_betweenness.get_edge_betweenness(graph, edge_betweenness, is_parallel);
 }
 
 void
@@ -92,7 +92,7 @@ do_pgr_betweenness(
             log << "Working with directed Graph\n";
             pgrouting::DirectedGraph digraph(gType);
             digraph.insert_edges(data_edges, total_edges);
-            path = pgr_betweenness(digraph,
+            pgr_betweenness(digraph,
                     edge_betweenness,
                     is_parallel,
                     only_cost);
@@ -100,8 +100,7 @@ do_pgr_betweenness(
             log << "Working with Undirected Graph\n";
             pgrouting::UndirectedGraph undigraph(gType);
             undigraph.insert_edges(data_edges, total_edges);
-            path = pgr_betweenness(
-                    undigraph,
+            pgr_betweenness(undigraph,
                     edge_betweenness,
                     is_parallel,
                     only_cost);
@@ -119,7 +118,10 @@ do_pgr_betweenness(
 
         (*return_tuples) = pgr_alloc(count, (*return_tuples));
         size_t sequence = 0;
-        path.generate_postgres_data(return_tuples, sequence);
+        for (auto edge : edge_betweenness) {
+            (*return_tuples)[sequence] = edge;
+            (*return_tuples)[sequence].seq = sequence++;
+        }
         (*return_count) = sequence;
 
         pgassert(*err_msg == NULL);
