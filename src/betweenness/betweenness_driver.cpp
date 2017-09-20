@@ -92,46 +92,36 @@ do_pgr_betweenness(
             log << "Working with directed Graph\n";
             pgrouting::DirectedGraph digraph(gType);
             digraph.insert_edges(data_edges, total_edges);
+            log << "Started printing graph\n";
             log << digraph;
-            /*
+            log << "\nFinished printing graph\n";
+            
             pgr_betweenness(digraph,
                     edge_betweenness,
                     is_parallel,
                     only_cost);
-                    */
-            pgr_betweenness_rt temp;
-            for (auto eit = boost::edges(digraph.graph).first; 
-            eit != boost::edges(digraph.graph).second; ++eit) {
-                //log << "Working with directed Graph\n";
-                temp.id = digraph[*eit].id;
-                temp.source = digraph[digraph.source(*eit)].id;
-                temp.target = digraph[digraph.target(*eit)].id;
-                temp.cost = digraph[*eit].cost;
-                edge_betweenness.push_back(temp);
-           }
+                    
         } else {
             log << "Working with Undirected Graph\n";
             pgrouting::UndirectedGraph undigraph(gType);
             undigraph.insert_edges(data_edges, total_edges);
             
-            /*pgr_betweenness(undigraph,
+            pgr_betweenness(undigraph,
                     edge_betweenness,
                     is_parallel,
                     only_cost);
-            */
-            pgr_betweenness_rt temp;
-            for (auto eit = boost::edges(undigraph.graph).first; 
-            eit != boost::edges(undigraph.graph).second; ++eit) {
-                //log << "Working with directed Graph\n";
-                temp.id = undigraph[*eit].id;
-                temp.source = undigraph[undigraph.source(*eit)].id;
-                temp.target = undigraph[undigraph.target(*eit)].id;
-                temp.cost = undigraph[*eit].cost;
-                edge_betweenness.push_back(temp);
-           }
+            
         }
 
         auto count = edge_betweenness.size();
+        #if 0
+        for (auto temp : edge_betweenness) {
+            log << "\nid: " << temp.id;
+            log << "\nsource: " << temp.source;
+            log << "\ntarget: " << temp.target;
+            log << "\ncost: " << temp.cost;
+        }
+        #endif
 
         if (count == 0) {
             (*return_tuples) = NULL;

@@ -247,13 +247,13 @@ PGDLLEXPORT Datum betweenness(PG_FUNCTION_ARGS) {
         }
 
         // postgres starts counting from 1
-        values[0] = Int32GetDatum(funcctx->call_cntr + 1);
+        //values[0] = Int32GetDatum(funcctx->call_cntr + 1);
         //values[1] = Int32GetDatum(result_tuples[funcctx->call_cntr].seq);
-        values[1] = Int64GetDatum(result_tuples[funcctx->call_cntr].id);
-        values[2] = Int64GetDatum(result_tuples[funcctx->call_cntr].source);
-        values[3] = Int64GetDatum(result_tuples[funcctx->call_cntr].target);
-        values[4] = Float8GetDatum(result_tuples[funcctx->call_cntr].cost);
-        //values[6] = Float8GetDatum(result_tuples[funcctx->call_cntr].betweenness);
+        values[0] = Int64GetDatum(result_tuples[funcctx->call_cntr].id);
+        values[1] = Int64GetDatum(result_tuples[funcctx->call_cntr].source);
+        values[2] = Int64GetDatum(result_tuples[funcctx->call_cntr].target);
+        values[3] = Float8GetDatum(result_tuples[funcctx->call_cntr].cost);
+        values[4] = Float8GetDatum(result_tuples[funcctx->call_cntr].betweenness);
         /**********************************************************************/
 
         tuple = heap_form_tuple(tuple_desc, values, nulls);

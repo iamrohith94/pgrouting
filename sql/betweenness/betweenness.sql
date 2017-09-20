@@ -35,7 +35,8 @@ CREATE OR REPLACE FUNCTION pgr_betweenness(
     OUT id BIGINT,
     OUT source BIGINT,
     OUT target BIGINT,
-    OUT cost FLOAT)
+    OUT cost FLOAT,
+    OUT betweenness FLOAT)
     
 
 RETURNS SETOF RECORD AS

@@ -92,21 +92,13 @@ public:
         boost::iterator_property_map< std::vector< double >::iterator, VertexIndexMap >
                   v_centrality_map(v_centrality_vec.begin(), v_index);
     	
-        //brandes_betweenness_centrality(graph.graph, v_centrality_map, e_centrality_map);
-        pgr_betweenness_rt temp;
+        brandes_betweenness_centrality(graph.graph, v_centrality_map, e_centrality_map);
+
         for (auto eit = boost::edges(graph.graph).first; 
             eit != boost::edges(graph.graph).second; ++eit) {
-               //std::cout << boost::source(*eit, g) << ' ' << boost::target(*eit, g) << std::endl;
-
-               //std::cout << edge << ": " << e_centrality_map[edge] << std::endl;
-                //temp.seq = 0;
-                temp.id = graph[*eit].id;
-                temp.source = graph[graph.source(*eit)].id;
-                temp.target = graph[graph.target(*eit)].id;
-                temp.cost = graph[*eit].cost;
-                edges_container.push_back(temp);
-                    //, e_centrality_map[*eit]});
-           }
+                edges_container.push_back({graph[*eit].id, graph[graph.source(*eit)].id,
+                    graph[graph.target(*eit)].id, graph[*eit].cost, e_centrality_map[*eit]});
+        }
     	
     }
 

@@ -66,7 +66,7 @@ typedef struct {
   int64_t source;
   int64_t target;
   double cost;
-  //double betweenness;
+  double betweenness;
   
 } pgr_betweenness_rt;
 
