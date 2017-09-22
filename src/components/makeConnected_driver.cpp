@@ -51,9 +51,18 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 template < class G >
 void
 pgr_makeConnected(G &graph,
-    std::vector<pgr_connections_rt>& results) {
+    std::vector<pgr_connections_rt>& results,
+    std::ostringstream& log) {
     Pgr_connect< G > fn_connections;
-    fn_connections.getConnections(graph, results);
+    fn_connections.getConnections(graph, results, log);    
+}
+
+template < class G >
+void
+pgr_makeStronglyConnected(G &graph,
+    std::vector<pgr_connections_rt>& results) {
+    Pgr_stronglyConnect< G > fn_connections;
+    fn_connections.getConnections(graph, results);   
 }
 
 
@@ -71,6 +80,7 @@ do_pgr_makeConnected(
     std::ostringstream err;
     std::ostringstream notice;
     try {
+
         pgassert(!(*log_msg));
         pgassert(!(*notice_msg));
         pgassert(!(*err_msg));
@@ -87,7 +97,7 @@ do_pgr_makeConnected(
             log << "Working with Directed Graph\n";
             pgrouting::DirectedGraph digraph(gType);
             digraph.insert_edges(data_edges, total_edges);
-            pgr_makeConnected(digraph,
+            pgr_makeStronglyConnected(digraph,
                 results);
         }
         else {
@@ -95,10 +105,12 @@ do_pgr_makeConnected(
             pgrouting::UndirectedGraph undigraph(gType);
             undigraph.insert_edges(data_edges, total_edges);
             pgr_makeConnected(undigraph,
-                results);
+                results, log);
         }
 
         auto count = results.size();
+
+
 
         if (count == 0) {
             (*return_tuples) = NULL;
@@ -113,6 +125,8 @@ do_pgr_makeConnected(
             *((*return_tuples) + i) = results[i];
         }
         (*return_count) = count;
+
+        log << "Finish........";
 
         pgassert(*err_msg == NULL);
         *log_msg = log.str().empty()?

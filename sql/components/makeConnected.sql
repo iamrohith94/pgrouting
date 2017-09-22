@@ -31,7 +31,7 @@ CREATE OR REPLACE FUNCTION pgr_makeConnected(
     TEXT,                       				-- edges_sql
     directed BOOLEAN DEFAULT true,				-- directed/undirected
     OUT source BIGINT,       					-- source of the link to be added
-    OUT target BIGINT,         					-- target of the link to be added
+    OUT target BIGINT)         					-- target of the link to be added
 
 RETURNS SETOF RECORD AS
 '$libdir/${PGROUTING_LIBRARY_NAME}', 'makeConnected'

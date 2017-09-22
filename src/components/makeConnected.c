@@ -102,15 +102,6 @@ process(
             edges,
             total_edges,
             directed,
-#if 0
-    /*
-     *  handling arrays example
-     */
-
-            start_vidsArr, size_start_vidsArr,
-            end_vidsArr, size_end_vidsArr,
-#endif
-
             result_tuples,
             result_count,
             &log_msg,
@@ -119,7 +110,7 @@ process(
 
     time_msg(" processing pgr_makeConnected", start_t, clock());
     PGR_DBG("Returning %ld tuples", *result_count);
-
+    PGR_DBG("Log: %s", log_msg);
     if (err_msg) {
         if (*result_tuples) pfree(*result_tuples);
     }

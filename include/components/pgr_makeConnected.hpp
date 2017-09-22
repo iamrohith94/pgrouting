@@ -42,6 +42,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #include <algorithm>
 
 template < class G > class Pgr_connect;
+template < class G > class Pgr_stronglyConnect;
 // user's functions
 // for development
 
@@ -57,16 +58,33 @@ class Pgr_connect {
     typedef typename std::map<int64_t, Identifiers<int64_t> > ComponentVertices;
     
     void getConnections(G &DAG, 
-        std::vector<pgr_connections_rt>& connections);
+        std::vector<pgr_connections_rt>& connections,
+        std::ostringstream& log);
 
     void makeConnected(G &DAG, 
-        std::vector<pgr_connections_rt>& connections);
-
-    void makeStronglyConnected(G &DAG,
-        std::vector<pgr_connections_rt>& connections);
+        std::vector<pgr_connections_rt>& connections,
+        std::ostringstream& log);
 
     void _makeConnected(G &DAG, 
         ComponentVertices component_vertices,
+        std::vector<pgr_connections_rt>& connections,
+        std::ostringstream& log);
+};
+
+
+template < class G >
+class Pgr_stronglyConnect {
+ public:
+    typedef typename G::V V;
+    typedef typename G::E E;
+    typedef typename G::EO_i EO_i;
+    typedef typename G::EI_i EI_i;
+    typedef typename std::map<int64_t, Identifiers<int64_t> > ComponentVertices;
+    
+    void getConnections(G &DAG, 
+        std::vector<pgr_connections_rt>& connections);
+
+    void makeStronglyConnected(G &DAG,
         std::vector<pgr_connections_rt>& connections);
 
     void _makeStronglyConnected(G &DAG, 
@@ -76,27 +94,29 @@ class Pgr_connect {
 
 template < class G >
 void Pgr_connect< G >::getConnections(G &graph, 
+        std::vector<pgr_connections_rt>& connections,
+        std::ostringstream& log) {
+    makeConnected(graph, connections, log);
+}
+
+template < class G >
+void Pgr_stronglyConnect< G >::getConnections(G &graph, 
         std::vector<pgr_connections_rt>& connections) {
-
-    if (graph.m_gType == UNDIRECTED) {
-        makeConnected(graph, connections);
-    }
-    else {
-        makeStronglyConnected(graph, connections);   
-    }
-
+    makeStronglyConnected(graph, connections);   
 
 }
 
 template < class G >
 void Pgr_connect< G >::makeConnected(G &graph, 
-        std::vector<pgr_connections_rt>& connections) {
+        std::vector<pgr_connections_rt>& connections,
+        std::ostringstream& log) {
     size_t totalNodes = graph.num_vertices();
     std::vector< int64_t > components(totalNodes);
     
     //Finding connected components
     int num_comps;
     num_comps = boost::connected_components(graph.graph, &components[0]);
+    log << "Initial connected components: " << num_comps << std::endl;
     
     if (num_comps == 1) {
         return ;
@@ -124,13 +144,14 @@ void Pgr_connect< G >::makeConnected(G &graph,
                 DAG.graph_add_edge(temp);
             }
         }
-        _makeConnected(DAG, component_vertices, connections);
+    log << "Initial DAG: " << DAG << std::endl;
+    //_makeConnected(DAG, component_vertices, connections, log);
 
 }
 
 
 template < class G >
-void Pgr_connect< G >::makeStronglyConnected(G &graph, 
+void Pgr_stronglyConnect< G >::makeStronglyConnected(G &graph, 
         std::vector<pgr_connections_rt>& connections) {
     size_t totalNodes = graph.num_vertices();
     std::vector< int64_t > components(totalNodes);
@@ -176,7 +197,8 @@ void Pgr_connect< G >::makeStronglyConnected(G &graph,
 template < class G >
 void Pgr_connect< G >::_makeConnected(G &DAG,
         ComponentVertices component_vertices,
-        std::vector<pgr_connections_rt>& connections) {
+        std::vector<pgr_connections_rt>& connections,
+        std::ostringstream& log) {
     if (component_vertices.size() <= 1) {
         return;
     }
@@ -204,7 +226,7 @@ void Pgr_connect< G >::_makeConnected(G &DAG,
         }
     }
 
-    _makeConnected(DAG, component_vertices, connections);
+    _makeConnected(DAG, component_vertices, connections, log);
     
 }
 
@@ -213,7 +235,7 @@ void Pgr_connect< G >::_makeConnected(G &DAG,
 
 
 template < class G >
-void Pgr_connect< G >::_makeStronglyConnected(G &DAG,
+void Pgr_stronglyConnect< G >::_makeStronglyConnected(G &DAG,
         ComponentVertices component_vertices,
         std::vector<pgr_connections_rt>& connections) {
     if (component_vertices.size() <= 1) {
