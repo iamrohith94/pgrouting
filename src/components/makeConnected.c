@@ -110,7 +110,6 @@ process(
 
     time_msg(" processing pgr_makeConnected", start_t, clock());
     PGR_DBG("Returning %ld tuples", *result_count);
-    PGR_DBG("Log: %s", log_msg);
     if (err_msg) {
         if (*result_tuples) pfree(*result_tuples);
     }

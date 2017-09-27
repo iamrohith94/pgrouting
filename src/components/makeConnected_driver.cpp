@@ -60,9 +60,10 @@ pgr_makeConnected(G &graph,
 template < class G >
 void
 pgr_makeStronglyConnected(G &graph,
-    std::vector<pgr_connections_rt>& results) {
+    std::vector<pgr_connections_rt>& results,
+    std::ostringstream& log) {
     Pgr_stronglyConnect< G > fn_connections;
-    fn_connections.getConnections(graph, results);   
+    fn_connections.getConnections(graph, results, log);   
 }
 
 
@@ -98,7 +99,7 @@ do_pgr_makeConnected(
             pgrouting::DirectedGraph digraph(gType);
             digraph.insert_edges(data_edges, total_edges);
             pgr_makeStronglyConnected(digraph,
-                results);
+                results, log);
         }
         else {
             log << "Working with UnDirected Graph\n";
@@ -111,12 +112,17 @@ do_pgr_makeConnected(
         auto count = results.size();
 
 
+        log << "Finish........";
 
         if (count == 0) {
             (*return_tuples) = NULL;
             (*return_count) = 0;
             notice <<
                 "No paths found between start_vid and end_vid vertices";
+
+            *log_msg = log.str().empty()?
+            *log_msg :
+            pgr_msg(log.str().c_str());
             return;
         }
 
@@ -126,7 +132,6 @@ do_pgr_makeConnected(
         }
         (*return_count) = count;
 
-        log << "Finish........";
 
         pgassert(*err_msg == NULL);
         *log_msg = log.str().empty()?
