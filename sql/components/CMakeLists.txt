@@ -5,6 +5,7 @@ SET(LOCAL_FILES
     biconnectedComponents.sql
     articulationPoints.sql
     bridges.sql
+    makeConnected.sql
     )
 
 # Do not modify below this line
