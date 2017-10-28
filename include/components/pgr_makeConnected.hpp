@@ -188,8 +188,7 @@ void Pgr_connect< G >::makeConnected(G &graph,
         }
         
     }
-
-    makeConnected(DAG, component_vertices, connections, log);
+    makeConnected(DAG, connections, log);
 
 }
 
