@@ -35,6 +35,10 @@ SELECT * FROM pgr_makeConnected(
 */
 \echo -- failing
 SELECT * FROM pgr_makeConnected(
-    'SELECT id, source, target, cost, reverse_cost FROM edge_table WHERE id = 2 OR id = 4 OR id = 5 OR id = 8 OR id = 10 OR id = 11 OR id = 12 OR id = 18');
+    'SELECT id, source, target, cost, reverse_cost FROM edge_table WHERE id = 6 OR id = 14 OR id = 18');
+
+\echo -- failing
+SELECT * FROM pgr_makeConnected(
+    'SELECT id, source, target, cost, reverse_cost FROM edge_table WHERE id = 5 OR id = 11 OR id = 18');
 
 
