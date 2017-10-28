@@ -1,3 +1,4 @@
+/*
 \echo -- q1
 SELECT * FROM pgr_makeConnected(
     'SELECT id, source, target, cost, reverse_cost FROM edge_table WHERE id = 1', false
@@ -28,6 +29,12 @@ SELECT * FROM pgr_makeConnected(
 SELECT * FROM pgr_makeConnected(
     'SELECT id, source, target, cost, reverse_cost FROM edge_table WHERE id = 2 OR id = 4 OR id = 5 OR id = 8 OR id = 10 OR id = 11 OR id = 12', false);
 
-\echo -- q8
+\echo -- failing
 SELECT * FROM pgr_makeConnected(
     'SELECT id, source, target, cost, reverse_cost FROM edge_table WHERE id = 2 OR id = 4 OR id = 5 OR id = 8 OR id = 10 OR id = 11 OR id = 12');
+*/
+\echo -- failing
+SELECT * FROM pgr_makeConnected(
+    'SELECT id, source, target, cost, reverse_cost FROM edge_table WHERE id = 2 OR id = 4 OR id = 5 OR id = 8 OR id = 10 OR id = 11 OR id = 12 OR id = 18');
+
+

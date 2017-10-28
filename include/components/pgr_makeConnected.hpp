@@ -156,7 +156,40 @@ void Pgr_connect< G >::makeConnected(G &graph,
             }
         }
     log << "Initial DAG: " << DAG << std::endl;
-    _makeConnected(DAG, component_vertices, connections, log);
+    //_makeConnected(DAG, component_vertices, connections, log);
+    if (component_vertices.size() <= 1) {
+        return;
+    }
+
+    pgrouting::Basic_edge shortcut;
+    log << "Adding links to DAG " <<  std::endl;
+    //Adding links to the DAG
+    for (auto vi = vertices(DAG.graph).first;
+                    vi != vertices(DAG.graph).second; ++vi) {
+        log << "vertex: " << DAG[*vi].id << std::endl;
+        
+        if (boost::degree(*vi, DAG.graph) == 0) {
+            
+            auto from_comp_id = DAG[*vi].id;
+            auto to_comp_id = (DAG[*vi].id +1)%DAG.num_vertices(); 
+            log << "from_comp_id: " << from_comp_id << std::endl;
+            log << "to_comp_id: " << to_comp_id << std::endl;
+            
+            connections.push_back({component_vertices[from_comp_id].front(),
+            component_vertices[to_comp_id].front()});
+            
+            //add edge to DAG
+            shortcut.source = from_comp_id;
+            shortcut.target = to_comp_id;
+            shortcut.id = boost::num_edges(DAG.graph);
+            shortcut.cost = 0.001;
+            DAG.graph_add_edge(shortcut);
+            
+        }
+        
+    }
+
+    makeConnected(DAG, component_vertices, connections, log);
 
 }
 
@@ -176,6 +209,7 @@ void Pgr_stronglyConnect< G >::makeStronglyConnected(G &graph,
                                               get(boost::vertex_index,
                                                   graph.graph)));
     log << "Initial connected components: " << num_comps << std::endl;
+    log << "Initial num vertices: " << totalNodes << std::endl;
     
     if (num_comps == 1) {
         return ;
@@ -195,22 +229,81 @@ void Pgr_stronglyConnect< G >::makeStronglyConnected(G &graph,
     pgr_edge_t temp;
     G DAG(DAG_vertices, graph.m_gType);
     // Constructing the DAG
-        for (auto eit = boost::edges(graph.graph).first; 
-                    eit != boost::edges(graph.graph).second; ++eit) {
-            V s, t;
-            s = graph.source(*eit);
-            t = graph.target(*eit);
-            if (components[s] != components[t]) {
-                temp.source = components[s];
-                temp.target = components[t];
-                temp.id = boost::num_edges(DAG.graph);
-                temp.cost = graph[*eit].cost;
-                temp.reverse_cost = -1;
-                DAG.graph_add_edge(temp);
-            }
+    for (auto eit = boost::edges(graph.graph).first; 
+                eit != boost::edges(graph.graph).second; ++eit) {
+        V s, t;
+        s = graph.source(*eit);
+        t = graph.target(*eit);
+        if (components[s] != components[t]) {
+            temp.source = components[s];
+            temp.target = components[t];
+            temp.id = boost::num_edges(DAG.graph);
+            temp.cost = graph[*eit].cost;
+            temp.reverse_cost = -1;
+            DAG.graph_add_edge(temp);
         }
-        log << "Initial DAG: " << DAG << std::endl;
-        _makeStronglyConnected(DAG, component_vertices, connections, log);
+    }
+    log << "Initial DAG: " << DAG << std::endl;
+    
+
+    pgr_edge_t shortcut;
+    int64_t curr_vid;
+    //Adding links to the DAG
+    for (auto vi = vertices(DAG.graph).first;
+                    vi != vertices(DAG.graph).second; ++vi) {
+        curr_vid = DAG[*vi].id;
+        log << "vertex: " << curr_vid << std::endl;
+        
+        int64_t from_comp_id, to_comp_id;
+        if (boost::in_degree(*vi, DAG.graph) != 0 && boost::out_degree(*vi, DAG.graph) != 0) {
+            continue;
+        }
+        
+        if (boost::in_degree(*vi, DAG.graph) == 0 && boost::out_degree(*vi, DAG.graph) == 0) {
+            from_comp_id = curr_vid;
+            to_comp_id = (curr_vid +1)%DAG.num_vertices(); 
+            //add edge to DAG
+            shortcut.cost = 1;
+            shortcut.reverse_cost = 1;
+        }
+        else if(boost::out_degree(*vi, DAG.graph) == 0) {
+            from_comp_id = curr_vid;
+            EI_i eit, eit_end;
+            boost::tie(eit, eit_end) = in_edges(*vi, DAG.graph);
+            to_comp_id = DAG[DAG.source(*eit)].id;
+            //add edge to DAG
+            shortcut.cost = 1;
+            shortcut.reverse_cost = -1;
+        }
+
+        else {
+            EO_i eit, eit_end;
+            boost::tie(eit, eit_end) = out_edges(*vi, DAG.graph);
+            from_comp_id = DAG[DAG.target(*eit)].id;
+            to_comp_id = curr_vid;
+            //add edge to DAG
+            shortcut.cost = 1;
+            shortcut.reverse_cost = -1;
+        }
+        log << "from_comp_id: " << from_comp_id << std::endl;
+        log << "to_comp_id: " << to_comp_id << std::endl;
+        shortcut.source = from_comp_id;
+        shortcut.target = to_comp_id;
+        shortcut.id = boost::num_edges(DAG.graph);
+
+        connections.push_back({component_vertices[from_comp_id].front(),
+            component_vertices[to_comp_id].front()});
+
+        if (shortcut.reverse_cost > 0) {
+            connections.push_back({component_vertices[to_comp_id].front(),
+            component_vertices[from_comp_id].front()});
+        }
+
+        //adding the connection to the graph
+        DAG.graph_add_edge(shortcut);
+        
+    }
+    makeStronglyConnected(DAG, connections, log);
 
 }
 
@@ -269,6 +362,11 @@ void Pgr_stronglyConnect< G >::_makeStronglyConnected(G &DAG,
         ComponentVertices component_vertices,
         std::vector<pgr_connections_rt>& connections,
         std::ostringstream& log) {
+    log << "component_vertices size: " << component_vertices.size() << std::endl;
+    for (int i = 0; i < component_vertices.size(); ++i) {
+        log << "component: " << i << std::endl;
+        log << "components: " << component_vertices[i] << std::endl;
+    }
     if (component_vertices.size() <= 1) {
         return;
     }
@@ -335,7 +433,7 @@ void Pgr_stronglyConnect< G >::_makeStronglyConnected(G &DAG,
         
     }
 
-    _makeStronglyConnected(DAG, component_vertices, connections, log);
+    //_makeStronglyConnected(DAG, component_vertices, connections, log);
 }
 
 
