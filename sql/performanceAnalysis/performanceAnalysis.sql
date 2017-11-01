@@ -32,7 +32,6 @@ CREATE OR REPLACE FUNCTION pgr_performanceAnalysis(
     algorithm TEXT,
     start_vids ANYARRAY,
     end_vids ANYARRAY,
-    level INTEGER DEFAULT 10,
     num_iterations INTEGER DEFAULT 1, 
     directed BOOLEAN DEFAULT true,
     only_cost BOOLEAN DEFAULT false,
@@ -42,8 +41,8 @@ CREATE OR REPLACE FUNCTION pgr_performanceAnalysis(
     OUT level INTEGER,
     OUT num_edges BIGINT,
     OUT num_vertices BIGINT,
-    OUT build_time FLOAT,
-    OUT computation_time FLOAT,
+    OUT graph_build_time FLOAT,
+    OUT avg_computation_time FLOAT,
     OUT path_len FLOAT)
 
 RETURNS SETOF RECORD AS

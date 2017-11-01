@@ -70,7 +70,6 @@ process(
         char* algorithm,
         ArrayType *start_vids,
         ArrayType *end_vids,
-        size_t level,
         size_t num_iterations,
         bool directed,
         bool only_cost,
@@ -122,7 +121,6 @@ process(
             size_start_vidsArr,
             end_vidsArr,
             size_end_vidsArr,
-            level,
             num_iterations,
             directed,
             only_cost,
@@ -191,9 +189,8 @@ PGDLLEXPORT Datum performanceAnalysis(PG_FUNCTION_ARGS) {
                 PG_GETARG_ARRAYTYPE_P(2),
                 PG_GETARG_ARRAYTYPE_P(3),
                 PG_GETARG_INT32(4),
-                PG_GETARG_INT32(5),
+                PG_GETARG_BOOL(5),
                 PG_GETARG_BOOL(6),
-                PG_GETARG_BOOL(7),
                 &result_tuples,
                 &result_count);
 
@@ -238,12 +235,12 @@ PGDLLEXPORT Datum performanceAnalysis(PG_FUNCTION_ARGS) {
     OUT time_taken FLOAT
          ***********************************************************************/
 
-        values = palloc(9 * sizeof(Datum));
-        nulls = palloc(9 * sizeof(bool));
+        values = palloc(8 * sizeof(Datum));
+        nulls = palloc(8 * sizeof(bool));
 
 
         size_t i;
-        for (i = 0; i < 9; ++i) {
+        for (i = 0; i < 8; ++i) {
             nulls[i] = false;
         }
 
@@ -251,12 +248,11 @@ PGDLLEXPORT Datum performanceAnalysis(PG_FUNCTION_ARGS) {
         values[0] = Int32GetDatum(funcctx->call_cntr + 1);
         values[1] = Int64GetDatum(result_tuples[funcctx->call_cntr].source);
         values[2] = Int64GetDatum(result_tuples[funcctx->call_cntr].target);
-        values[3] = Int32GetDatum(result_tuples[funcctx->call_cntr].level);
-        values[4] = Int64GetDatum(result_tuples[funcctx->call_cntr].num_edges);
-        values[5] = Int64GetDatum(result_tuples[funcctx->call_cntr].num_vertices);
-        values[6] = Float8GetDatum(result_tuples[funcctx->call_cntr].graph_build_time);
-        values[7] = Float8GetDatum(result_tuples[funcctx->call_cntr].avg_computation_time);
-        values[8] = Float8GetDatum(result_tuples[funcctx->call_cntr].path_len);
+        values[3] = Int64GetDatum(result_tuples[funcctx->call_cntr].num_edges);
+        values[4] = Int64GetDatum(result_tuples[funcctx->call_cntr].num_vertices);
+        values[5] = Float8GetDatum(result_tuples[funcctx->call_cntr].graph_build_time);
+        values[6] = Float8GetDatum(result_tuples[funcctx->call_cntr].avg_computation_time);
+        values[7] = Float8GetDatum(result_tuples[funcctx->call_cntr].path_len);
         /**********************************************************************/
 
         tuple = heap_form_tuple(tuple_desc, values, nulls);

@@ -56,7 +56,6 @@ extern "C" {
                 size_t size_start_vids,
                 int64_t* end_vids,
                 size_t size_end_vids,
-                size_t level,
                 size_t num_iterations,
                 bool directed,
                 bool only_cost,

@@ -53,7 +53,6 @@ pgr_performanceAnalysis(
         G &graph,
         std::vector<int64_t> sources,
         std::vector<int64_t> targets,
-        size_t level,
         size_t num_iterations,
         double graph_build_time,
         bool only_cost = false) {
@@ -74,7 +73,6 @@ pgr_performanceAnalysis(
     */
 
     temp.graph_build_time = graph_build_time;
-    temp.level = level;
     temp.num_vertices = graph.num_vertices();
     temp.num_edges = boost::num_edges(graph.graph);
     for (size_t i = 0; i < sources.size(); ++i) {
@@ -104,7 +102,6 @@ do_pgr_performanceAnalysis(
         size_t size_start_vidsArr,
         int64_t* end_vidsArr,
         size_t size_end_vidsArr,
-        size_t level,
         size_t num_iterations,
         bool directed,
         bool only_cost,
@@ -160,7 +157,6 @@ do_pgr_performanceAnalysis(
             performance_details = pgr_performanceAnalysis(digraph,
                     start_vertices,
                     end_vertices,
-                    level,
                     num_iterations,
                     build_time,
                     only_cost);
@@ -175,7 +171,6 @@ do_pgr_performanceAnalysis(
                     undigraph,
                     start_vertices,
                     end_vertices,
-                    level,
                     num_iterations,
                     build_time,
                     only_cost);

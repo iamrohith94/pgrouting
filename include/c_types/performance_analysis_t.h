@@ -58,7 +58,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 typedef struct {
     int64_t source;
     int64_t target;
-    int level;
     int64_t num_edges;
     int64_t num_vertices;
     double graph_build_time;
