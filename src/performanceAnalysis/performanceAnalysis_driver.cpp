@@ -83,11 +83,12 @@ pgr_performanceAnalysis(
         temp.avg_computation_time = 0.0000;
         for (size_t j = 0; j < num_iterations; ++j) {
             start_t = clock();
-            fn_dijkstra.dijkstra(graph, sources[i], targets[i], only_cost);
+            path = fn_dijkstra.dijkstra(graph, sources[i], targets[i], only_cost);
             end_t = clock();
             temp.avg_computation_time += (double)(1000.0 * (end_t-start_t) / CLOCKS_PER_SEC);
         }
-        temp.avg_computation_time /= num_iterations;        
+        temp.avg_computation_time /= num_iterations;
+        temp.path_len = path.tot_cost();   
         return_tuples.push_back(temp);
     }
     return return_tuples;
