@@ -38,7 +38,6 @@ CREATE OR REPLACE FUNCTION pgr_performanceAnalysis(
     OUT seq INTEGER,
     OUT source BIGINT,
     OUT target BIGINT,
-    OUT level INTEGER,
     OUT num_edges BIGINT,
     OUT num_vertices BIGINT,
     OUT graph_build_time FLOAT,

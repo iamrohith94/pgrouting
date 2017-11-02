@@ -55,8 +55,8 @@ pgr_performanceAnalysis(
         std::vector<int64_t> targets,
         size_t num_iterations,
         double graph_build_time,
+        std::ostringstream& log,
         bool only_cost = false) {
-    Path path;
     Pgr_dijkstra< G > fn_dijkstra;
     clock_t start_t, end_t;
     std::deque< Performance_analysis_t > return_tuples;
@@ -76,17 +76,24 @@ pgr_performanceAnalysis(
     temp.num_vertices = graph.num_vertices();
     temp.num_edges = boost::num_edges(graph.graph);
     for (size_t i = 0; i < sources.size(); ++i) {
+        if (sources[i] == targets[i])
+            continue;
+        Path path;
         temp.source = sources[i];
         temp.target = targets[i];
+
         temp.avg_computation_time = 0.0000;
         for (size_t j = 0; j < num_iterations; ++j) {
             start_t = clock();
             path = fn_dijkstra.dijkstra(graph, sources[i], targets[i], only_cost);
             end_t = clock();
             temp.avg_computation_time += (double)(1000.0 * (end_t-start_t) / CLOCKS_PER_SEC);
+            temp.path_len = path.tot_cost();
+            log << "tot_cost: " << temp.path_len << std::endl;
+            path.clear();
         }
-        temp.avg_computation_time /= num_iterations;
-        temp.path_len = path.tot_cost();   
+        temp.avg_computation_time /= num_iterations;   
+        temp.path_len /= num_iterations;
         return_tuples.push_back(temp);
     }
     return return_tuples;
@@ -159,6 +166,7 @@ do_pgr_performanceAnalysis(
                     end_vertices,
                     num_iterations,
                     build_time,
+                    log,
                     only_cost);
         } else {
             log << "Working with Undirected Graph\n";
@@ -173,6 +181,7 @@ do_pgr_performanceAnalysis(
                     end_vertices,
                     num_iterations,
                     build_time,
+                    log,
                     only_cost);
         }
 

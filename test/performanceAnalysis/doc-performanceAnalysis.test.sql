@@ -1,15 +1,5 @@
 
 \echo -- q1
-SELECT * FROM pgr_performanceAnalysis(
-    'SELECT id, source, target, cost, reverse_cost FROM edge_table',
-    2, 3
-);
-
-\echo -- q2
-SELECT * FROM pgr_performanceAnalysis(
-    'SELECT id, source, target, cost, reverse_cost FROM edge_table',
-    2, 3,
-    FALSE
-);
-\echo -- q3
+SELECT * FROM pgr_performanceAnalysis('select id, source, target, cost, reverse_cost from edge_table',
+	'd' ,ARRAY[2], ARRAY[8], 3);
 
