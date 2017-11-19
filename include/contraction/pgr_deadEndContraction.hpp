@@ -334,7 +334,7 @@ template < class G >
 void
 Pgr_deadend<G>::doContraction(G &graph) {
 #ifndef NDEBUG
-    debug << "Performing contraction\n";
+    debug << "Performing dead end contraction\n";
 #endif
     std::priority_queue<V, std::vector<V>, std::greater<V> > deadendPriority;
 

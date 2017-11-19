@@ -90,24 +90,33 @@ template < class G >
 void
 Pgr_linear< G >::setForbiddenVertices(
         Identifiers<V> forbidden_vertices) {
+#ifndef NDEBUG
     debug << "Setting forbidden vertices\n";
+#endif
     forbiddenVertices = forbidden_vertices;
 }
 
 
 template < class G >
 bool Pgr_linear<G>::is_linear(G &graph, V v) {
-    degree_size_type in_degree, out_degree;
-    in_degree = graph.in_degree(v);
-    out_degree = graph.out_degree(v);
-    Identifiers<V> adjacent_vertices = graph.find_adjacent_vertices(v);
+#ifndef NDEBUG
+    debug << "Is linear: " << graph.graph[v].id << "?\n";
+#endif
+    if (forbiddenVertices.has(v)) {
+        /**
+         * - fobbiden_vertices
+         *   - Not considered as linear
+         */
+
+        return false;
+    }
+    auto adjacent_vertices = graph.find_adjacent_vertices(v);
     if (adjacent_vertices.size() == 2) {
-        if (in_degree > 0 && out_degree > 0) {
-            debug << graph.graph[v].id << " is linear " << std::endl;
+        if (graph.in_degree(v) > 0 && graph.out_degree(v) > 0) {
             return true;
         }
     }
-    debug << graph.graph[v].id << " is not linear " << std::endl;
+    debug << "Is Not Linear\n";
     return false;
 }
 
@@ -118,8 +127,14 @@ void Pgr_linear<G>::calculateVertices(G &graph) {
     for (vi = vertices(graph.graph).first;
             vi != vertices(graph.graph).second;
             ++vi) {
-        debug << "Checking vertex " << graph.graph[(*vi)].id << '\n';
+#ifndef NDEBUG
+        debug << "Checking vertex " << graph[(*vi)].id << '\n';
+#endif
         if (is_linear(graph, *vi)) {
+
+#ifndef NDEBUG
+            debug << "Adding " << graph[(*vi)].id << " to linear" << '\n';
+#endif
             linearVertices += (*vi);
         }
     }
@@ -127,27 +142,43 @@ void Pgr_linear<G>::calculateVertices(G &graph) {
 }
 
 
+template < class G >
+void
+Pgr_deadend<G>::add_if_linear(G &graph, V v) {
+    if (is_linear(graph, v)) {
+        linearVertices += v;
+    }
+}
+
+
 
 template < class G >
 void Pgr_linear<G>::doContraction(G &graph) {
-    std::ostringstream contraction_debug;
-    contraction_debug << "Performing contraction\n";
+#ifndef NDEBUG
+    debug << "Performing linear contraction\n";
+#endif
     std::priority_queue<V, std::vector<V>, std::greater<V> > linearPriority;
-    for (const auto linearVertex : linearVertices) {
+
+    for (V linearVertex : linearVertices) {
         linearPriority.push(linearVertex);
     }
-    contraction_debug << "Linear vertices" << std::endl;
-    for (const auto v : linearVertices) {
-        contraction_debug << graph[v].id << ", ";
+
+#ifndef NDEBUG
+    debug << "Linear vertices" << std::endl;
+    for (V v : linearVertices) {
+        debug << graph[v].id << ", ";
     }
-    contraction_debug << std::endl;
+    debug << std::endl;
+#endif
+
     while (!linearPriority.empty()) {
         V current_vertex = linearPriority.top();
         linearPriority.pop();
+
         if (!is_linear(graph, current_vertex)) {
-            linearVertices -= current_vertex;
             continue;
         }
+
         Identifiers<V> adjacent_vertices =
             graph.find_adjacent_vertices(current_vertex);
         pgassert(adjacent_vertices.size() == 2);
@@ -157,10 +188,12 @@ void Pgr_linear<G>::doContraction(G &graph) {
         V vertex_2 = adjacent_vertices.front();
         adjacent_vertices.pop_front();
 
-        contraction_debug << "Adjacent vertices\n";
-        contraction_debug << graph[vertex_1].id
+#ifndef NDEBUG
+        debug << "Adjacent vertices\n";
+        debug << graph[vertex_1].id
             << ", " << graph[vertex_2].id
             << std::endl;
+#endif
 
         if (graph.m_gType == DIRECTED) {
             if (graph.out_degree_to_vertex(vertex_1, current_vertex) > 0 &&
@@ -206,7 +239,7 @@ void Pgr_linear<G>::doContraction(G &graph) {
             linearVertices += vertex_2;
         }
     }
-    debug << contraction_debug.str().c_str() << "\n";
+    //debug << contraction_debug.str().c_str() << "\n";
 }
 
 
