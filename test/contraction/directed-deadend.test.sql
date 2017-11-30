@@ -5,7 +5,7 @@
 SELECT * FROM pgr_contractGraph(
     'SELECT id, source, target, cost, reverse_cost FROM edge_table WHERE id = 1',
     ARRAY[-1]::integer[], 1, ARRAY[]::BIGINT[], true);
-*/
+
 -- \echo --q0 -------------------------------------------
 
 \echo --q1 Checking dead end contraction for single edge
@@ -25,7 +25,7 @@ SELECT * FROM pgr_contractGraph(
     'SELECT id, source, target, cost, reverse_cost FROM edge_table',
     ARRAY[1]::integer[], 1, ARRAY[]::BIGINT[], true);
 -- \echo --q3 -------------------------------------------
-
+*/
 /*
 -- this test fails becuse parameter is wrong
 \echo --q4 Checking that forbidden vertices can only be one dimensional or empty
@@ -36,9 +36,8 @@ SELECT * FROM pgr_contractGraph(
 */
 
 \echo --q5 Checking dead end contraction for a graph with no dead end vertex
-SELECT * FROM pgr_contractGraph(
-	'SELECT id, source, target, cost, reverse_cost FROM edge_table 
-	WHERE id = 2 OR id = 4 OR id = 5 OR id = 8',
-	ARRAY[1]::integer[], 1, ARRAY[]::BIGINT[], true);
--- \echo --q5 -------------------------------------------
+select * from pgr_contractgraph
+('select id, source, target, cost, reverse_cost from edge_table where id =any( ARRAY[2, 4, 5, 8, 10, 11, 12])'
+    , ARRAY[1]);
 
+-- \echo --q5 -------------------------------------------

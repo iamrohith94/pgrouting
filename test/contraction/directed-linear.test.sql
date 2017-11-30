@@ -1,4 +1,4 @@
-
+/*
 \echo --q6 Checking for linear vertices case 1
 SELECT * FROM pgr_contractGraph(
     'SELECT id, source, target, cost, reverse_cost FROM edge_table 
@@ -42,4 +42,9 @@ SELECT * FROM pgr_contractGraph(
     WHERE id = 2 OR id = 4 OR id = 5 OR id = 8',
     ARRAY[2]::integer[], 1, ARRAY[]::BIGINT[], true);
 -- \echo --q13 -------------------------------------------
+*/
 
+
+SELECT * FROM pgr_contractGraph(
+    'SELECT id, source, target, cost, reverse_cost FROM edge_table',
+    ARRAY[2]::integer[], 1, ARRAY[]::BIGINT[], true);

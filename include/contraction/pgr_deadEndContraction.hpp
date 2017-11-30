@@ -359,7 +359,7 @@ Pgr_deadend<G>::doContraction(G &graph) {
                 << graph[current_vertex].id << std::endl;
 #endif
             graph[adjacent_vertex].add_contracted_vertex(
-                    graph[current_vertex], current_vertex);
+                    graph[current_vertex]);
 
 #ifndef NDEBUG
             debug << "Adding contracted vertices of the edge\n";
@@ -387,6 +387,7 @@ Pgr_deadend<G>::doContraction(G &graph) {
             debug << graph[adjacent_vertex];
 #endif
             graph.disconnect_vertex(current_vertex);
+            graph[current_vertex].clear_contracted_vertices();
             deadendVertices -= current_vertex;
 #ifndef NDEBUG
             debug << "Adjacent vertex dead_end?: "

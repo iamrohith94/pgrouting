@@ -61,8 +61,8 @@ static void process_contraction(
         const std::vector< int64_t > forbidden_vertices,
         const std::vector< int64_t > contraction_order,
         int64_t max_cycles,
-        Identifiers<int64_t> &remaining_vertices,
-        std::vector< pgrouting::CH_edge > &shortcut_edges,
+        //Identifiers<int64_t> &remaining_vertices,
+        //std::vector< pgrouting::CH_edge > &shortcut_edges,
         std::ostringstream &log,
         std::ostringstream &err) {
     graph.insert_edges(edges);
@@ -95,12 +95,16 @@ static void process_contraction(
     pgrouting::contraction::Pgr_contract<G> result(graph,
             forbid_vertices,
             contraction_order,
-            max_cycles, remaining_vertices,
-            shortcut_edges, log);
+            max_cycles, 
+            //remaining_vertices,
+            //shortcut_edges, 
+            log);
 
 #ifndef NDEBUG
+     
     log << "After contraction\n";
     log << graph;
+    #if 0
     log << "Remaining Vertices:" << "\n";
     for (const auto vertex : remaining_vertices) {
         log << vertex << "\n";
@@ -109,6 +113,7 @@ static void process_contraction(
     for (const auto edge : shortcut_edges) {
         log << edge << "\n";
     }
+    #endif
 #endif
 }
 
@@ -116,14 +121,22 @@ template <typename G>
 static
 void get_postgres_result(
         G &graph,
-        const Identifiers<int64_t> remaining_vertices,
-        const std::vector< pgrouting::CH_edge > shortcut_edges,
-        contracted_rt **return_tuples) {
-    (*return_tuples) = pgr_alloc(
-            remaining_vertices.size() + shortcut_edges.size(),
-            (*return_tuples));
+        contracted_rt **return_tuples,
+        size_t *return_tuples_size) {
+    std::vector<contracted_rt> results;
+    
+    Identifiers<int64_t> remaining_vertices;
+    std::vector< pgrouting::CH_edge > shortcut_edges;
+    graph.get_remaining_vertices(remaining_vertices);
+    graph.get_shortcuts(shortcut_edges);
 
+
+    (*return_tuples_size) = remaining_vertices.size() + shortcut_edges.size();
+    (*return_tuples) = pgr_alloc(
+               (*return_tuples_size), (*return_tuples));
     size_t sequence = 0;
+    
+    
 
     for (auto id : remaining_vertices) {
         int64_t* contracted_vertices = NULL;
@@ -139,10 +152,10 @@ void get_postgres_result(
 
         ++sequence;
     }
-
+    #if 1
     for (auto edge : shortcut_edges) {
         int64_t* contracted_vertices = NULL;
-        auto ids = graph.get_ids(edge.contracted_vertices());
+        auto ids = edge.contracted_vertices();
 
         contracted_vertices = pgr_alloc(
                    ids.size(), contracted_vertices);
@@ -156,6 +169,8 @@ void get_postgres_result(
 
         ++sequence;
     }
+    #endif
+
 }
 
 
@@ -221,8 +236,8 @@ do_pgr_contractGraph(
         /*
          * Extracting vertices of the graph
          */
-        Identifiers<int64_t> remaining_vertices;
-        std::vector< pgrouting::CH_edge > shortcut_edges;
+        //Identifiers<int64_t> remaining_vertices;
+        //std::vector< pgrouting::CH_edge > shortcut_edges;
 
 #ifndef NDEBUG
         log << "Original Graph: \n" <<
@@ -259,32 +274,38 @@ do_pgr_contractGraph(
 
             process_contraction(digraph, edges, forbid, ordering,
                     max_cycles,
-                    remaining_vertices, shortcut_edges,
+                    //remaining_vertices, 
+                    //shortcut_edges,
                     log, err);
+
+            
 
             get_postgres_result(
                     digraph,
-                    remaining_vertices,
-                    shortcut_edges,
-                    return_tuples);
+                    //remaining_vertices,
+                    //shortcut_edges,
+                    return_tuples,
+                    return_count);
         } else {
             log << "Working with Undirected Graph\n";
 
             pgrouting::CHUndirectedGraph undigraph(gType);
             process_contraction(undigraph, edges, forbid, ordering,
                     max_cycles,
-                    remaining_vertices, shortcut_edges,
+                    //remaining_vertices, 
+                    //shortcut_edges,
                     log, err);
-
+            
             get_postgres_result(
                     undigraph,
-                    remaining_vertices,
-                    shortcut_edges,
-                    return_tuples);
+                    //remaining_vertices,
+                    //shortcut_edges,
+                    return_tuples,
+                    return_count);
         }
 
-        (*return_count) = remaining_vertices.size()+shortcut_edges.size();
 
+        //(*return_count) = remaining_vertices.size()+shortcut_edges.size();
 
         *log_msg = log.str().empty()?
             *log_msg :

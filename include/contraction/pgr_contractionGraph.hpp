@@ -47,18 +47,17 @@ namespace graph {
 template <class G, typename T_V, typename T_E>
 class Pgr_contractionGraph;
 }
+typedef  graph::Pgr_contractionGraph <
+boost::adjacency_list < boost::listS, boost::vecS,
+boost::undirectedS,
+CH_vertex, CH_edge >,
+CH_vertex, CH_edge > CHUndirectedGraph;
 
-    typedef  graph::Pgr_contractionGraph <
-    boost::adjacency_list < boost::listS, boost::vecS,
-    boost::undirectedS,
-    CH_vertex, CH_edge >,
-    CH_vertex, CH_edge > CHUndirectedGraph;
-
-    typedef  graph::Pgr_contractionGraph <
-    boost::adjacency_list < boost::listS, boost::vecS,
-    boost::bidirectionalS,
-    CH_vertex, CH_edge >,
-    CH_vertex, CH_edge > CHDirectedGraph;
+typedef  graph::Pgr_contractionGraph <
+boost::adjacency_list < boost::listS, boost::vecS,
+boost::bidirectionalS,
+CH_vertex, CH_edge >,
+CH_vertex, CH_edge > CHDirectedGraph;
 
 namespace graph {
 
@@ -214,8 +213,8 @@ class Pgr_contractionGraph : public Pgr_base_graph<G, T_V, T_E> {
              for (boost::tie(out, out_end) = out_edges(*vi, this->graph);
                      out != out_end; ++out) {
                  log << ' ' << this->graph[*out].id
-                     << "=(" << this->graph[this->source(*out)].id
-                     << ", " << this->graph[this->target(*out)].id << ") = "
+                    << "=(" << this->graph[this->source(*out)].id
+                    << ", " << this->graph[this->target(*out)].id << ") = "
                      <<  this->graph[*out].cost <<"\t";
              }
              log << std::endl;
@@ -236,7 +235,7 @@ class Pgr_contractionGraph : public Pgr_base_graph<G, T_V, T_E> {
 
          size_t count = 0;
          for (auto idx :  this->graph[v].contracted_vertices()) {
-             ids[count++] =  this->graph[idx].id;
+             ids[count++] =  idx;
          }
          return ids;
      }
@@ -294,6 +293,44 @@ class Pgr_contractionGraph : public Pgr_base_graph<G, T_V, T_E> {
 
          shortcuts.push_back(edge);
      }
+
+     bool is_contracted(V v) {
+     	return this->graph[v].has_contracted_vertices();
+     }
+
+     bool is_contracted(E e) {
+     	return this->graph[e].id < -1;
+     }
+
+     void get_remaining_vertices(Identifiers<int64_t>& remaining_vertices) {
+        V vi;
+        for (auto vi = vertices(this->graph).first;
+                vi != vertices(this->graph).second;
+                ++vi) {
+            if (is_contracted(*vi)) {
+                remaining_vertices += this->graph[*vi].id;
+            }
+        }
+    }
+
+     void get_shortcuts(std::vector< CH_edge >& shortcut_edges) {
+         V vi;
+         EO_i out, out_end;
+         for (auto vi = vertices(this->graph).first;
+                vi != vertices(this->graph).second;
+                ++vi) {
+            if ((*vi) >= this->m_num_vertices) break;
+         
+            for (boost::tie(out, out_end) = out_edges(*vi, this->graph);
+                    out != out_end; ++out) {
+
+                if (is_contracted(*out)) {
+                    shortcut_edges.push_back(this->graph[*out]);
+                }
+            }
+        }
+     }
+
 };
 
 }  // namespace graph

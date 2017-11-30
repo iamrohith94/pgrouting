@@ -54,7 +54,6 @@ class Pgr_contract {
         Pgr_deadend<G> deadendContractor;
         debug << "Setting forbidden_vertices";
         deadendContractor.setForbiddenVertices(forbidden_vertices);
-
         deadendContractor.calculateVertices(graph);
         try {
             deadendContractor.doContraction(graph);
@@ -71,14 +70,14 @@ class Pgr_contract {
         std::ostringstream linear_debug;
         Pgr_linear<G> linearContractor;
         linearContractor.setForbiddenVertices(forbidden_vertices);
-        linearContractor.calculateVertices(graph);
+        linearContractor.calculateVertices(graph, debug);
         try {
-            linearContractor.doContraction(graph);
+            linearContractor.doContraction(graph, debug);
         }
         catch ( ... ) {
-            linear_debug << "Caught unknown exception!\n";
+            debug << "Caught unknown exception!\n";
         }
-        debug << linear_debug.str().c_str() << "\n";
+        //debug << linear_debug.str().c_str() << "\n";
     }
 
 
@@ -88,8 +87,8 @@ class Pgr_contract {
             Identifiers<V> forbidden_vertices,
             std::vector<int64_t> contraction_order,
             int64_t max_cycles,
-            Identifiers<int64_t> &remaining_vertices,
-            std::vector<pgrouting::CH_edge> &shortcut_edges,
+            //Identifiers<int64_t> &remaining_vertices,
+            //std::vector<pgrouting::CH_edge> &shortcut_edges,
             std::ostringstream& debug) {
         std::deque<int64_t> contract_order;
         //  push -1 to indicate the start of the queue
@@ -106,37 +105,37 @@ class Pgr_contract {
             while (front != -1) {
                 switch (front) {
                     case -1:
-                        debug << "Finished cycle " << i+1 << std::endl;
+                        debug << "Finished cycle " << i+1 << "\n";
                         break;
                     default:
                         debug << "contraction "<< front
-                            << " asked" << std::endl;
+                            << " asked" << "\n";
                         if (front == 1) {
 #ifndef NDEBUG
                             debug << "Graph before dead end contraction"
-                                << std::endl;
+                                << "\n";
                             graph.print_graph(debug);
                             debug << "Performing dead end contraction"
-                                << std::endl;
+                                << "\n";
 #endif
                             perform_deadEnd(graph, forbidden_vertices, debug);
 #ifndef NDEBUG
                             debug << "Graph after dead end contraction"
-                                << std::endl;
+                                << "\n";
                             graph.print_graph(debug);
 #endif
                         } else if (front == 2) {
 #ifndef NDEBUG
                             debug << "Graph before linear contraction"
-                                << std::endl;
+                                << "\n";
                             graph.print_graph(debug);
                             debug << "Performing linear contraction"
-                                << std::endl;
+                                << "\n";
 #endif
                             perform_linear(graph, forbidden_vertices, debug);
 #ifndef NDEBUG
                             debug << "Graph after linear contraction"
-                                << std::endl;
+                                << "\n";
                             graph.print_graph(debug);
 #endif
                         }
@@ -146,12 +145,14 @@ class Pgr_contract {
                 }
             }
         }
+        #if 0
         remaining_vertices = graph.get_changed_vertices();
         debug << "Printing shortcuts\n";
         for (auto shortcut : graph.shortcuts) {
             debug << shortcut;
             shortcut_edges.push_back(shortcut);
         }
+        #endif
     }
 
 #if 0
