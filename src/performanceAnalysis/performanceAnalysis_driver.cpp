@@ -57,7 +57,6 @@ pgr_performanceAnalysis(
         double graph_build_time,
         std::ostringstream& log,
         bool only_cost = false) {
-    Pgr_dijkstra< G > fn_dijkstra;
     clock_t start_t, end_t;
     std::deque< Performance_analysis_t > return_tuples;
     Performance_analysis_t temp;
@@ -72,12 +71,15 @@ pgr_performanceAnalysis(
             targets.end());
     */
 
+    Pgr_dijkstra< G > fn_dijkstra;
     temp.graph_build_time = graph_build_time;
     temp.num_vertices = graph.num_vertices();
     temp.num_edges = boost::num_edges(graph.graph);
     for (size_t i = 0; i < sources.size(); ++i) {
+        temp.path_len = 0.000;
         if (sources[i] == targets[i])
             continue;
+
         Path path;
         temp.source = sources[i];
         temp.target = targets[i];
@@ -85,15 +87,18 @@ pgr_performanceAnalysis(
         temp.avg_computation_time = 0.0000;
         for (size_t j = 0; j < num_iterations; ++j) {
             start_t = clock();
+            log << "before_cost: " << path.tot_cost() << std::endl;
             path = fn_dijkstra.dijkstra(graph, sources[i], targets[i], only_cost);
+            log << "size: " << path.size() << std::endl;
+            path.recalculate_agg_cost();
             end_t = clock();
             temp.avg_computation_time += (double)(1000.0 * (end_t-start_t) / CLOCKS_PER_SEC);
-            temp.path_len = path.tot_cost();
-            log << "tot_cost: " << temp.path_len << std::endl;
+            temp.path_len += path.tot_cost();
             path.clear();
         }
         temp.avg_computation_time /= num_iterations;   
         temp.path_len /= num_iterations;
+        log << "tot_cost: " << temp.path_len << std::endl;
         return_tuples.push_back(temp);
     }
     return return_tuples;
