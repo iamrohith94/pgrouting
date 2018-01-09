@@ -38,3 +38,8 @@ void time_msg(char *msg, clock_t start_t, clock_t end_t) {
             (double) end_t,
             (double) start_t);
 }
+
+
+double get_elapsed_time(clock_t start_t, clock_t end_t) {
+    return (double)(end_t - start_t) / CLOCKS_PER_SEC;
+}

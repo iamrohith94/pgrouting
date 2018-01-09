@@ -60,6 +60,7 @@ typedef struct {
     int64_t target;
     int64_t num_edges;
     int64_t num_vertices;
+    double edges_read_time;
     double graph_build_time;
     double avg_computation_time;
     double path_len;

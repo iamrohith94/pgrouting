@@ -32,4 +32,5 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 void time_msg(char *msg, clock_t start_t, clock_t end_t);
 
+double get_elapsed_time(clock_t start_t, clock_t end_t);
 #endif  // INCLUDE_C_COMMON_TIME_MSG_H_

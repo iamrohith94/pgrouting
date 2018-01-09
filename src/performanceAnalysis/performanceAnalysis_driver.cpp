@@ -87,9 +87,9 @@ pgr_performanceAnalysis(
         temp.avg_computation_time = 0.0000;
         for (size_t j = 0; j < num_iterations; ++j) {
             start_t = clock();
-            log << "before_cost: " << path.tot_cost() << std::endl;
+            //log << "before_cost: " << path.tot_cost() << std::endl;
             path = fn_dijkstra.dijkstra(graph, sources[i], targets[i], only_cost);
-            log << "size: " << path.size() << std::endl;
+            //log << "size: " << path.size() << std::endl;
             path.recalculate_agg_cost();
             end_t = clock();
             temp.avg_computation_time += (double)(1000.0 * (end_t-start_t) / CLOCKS_PER_SEC);
@@ -98,8 +98,14 @@ pgr_performanceAnalysis(
         }
         temp.avg_computation_time /= num_iterations;   
         temp.path_len /= num_iterations;
-        log << "tot_cost: " << temp.path_len << std::endl;
+        //log << "tot_cost: " << temp.path_len << std::endl;
         return_tuples.push_back(temp);
+        log << "Source: " << temp.source << ", ";
+        log << "Target: " << temp.target << ", ";
+        log << "Num Edges: " << temp.num_edges << ", ";
+        log << "Num Vertices: " << temp.num_vertices << ", ";
+        log << "Avg comp time: " << temp.avg_computation_time << ", ";
+        log << "Path Length: " << temp.path_len << ", ";
     }
     return return_tuples;
 }
@@ -137,6 +143,7 @@ do_pgr_performanceAnalysis(
         clock_t start_t, end_t;
         double build_time;
 
+        #if 0
         log << "Size of start_vertices: " << size_start_vidsArr << std::endl;
         log << "Start vertices" << std::endl;
         for (size_t i = 0; i < size_start_vidsArr; ++i) {
@@ -148,19 +155,22 @@ do_pgr_performanceAnalysis(
             log << end_vidsArr[i] << std::endl;
         }
         log << "Inserting vertices into a c++ vector structure";
+        #endif
         std::vector<int64_t>
         start_vertices(start_vidsArr, start_vidsArr + size_start_vidsArr);
         std::vector<int64_t>
         end_vertices(end_vidsArr, end_vidsArr + size_end_vidsArr);
 
+        #if 0
         log << "Size of start_vertices: " << start_vertices.size() << std::endl;
         log << "Size of end_vertices: " << end_vertices.size() << std::endl;
+        #endif
 
         std::deque< Performance_analysis_t > performance_details;
         std::deque< Performance_analysis_t >::iterator it;
 
         if (directed) {
-            log << "Working with directed Graph\n";
+            //log << "Working with directed Graph\n";
             pgrouting::DirectedGraph digraph(gType);
             start_t = clock();
             digraph.insert_edges(data_edges, total_edges);
@@ -174,7 +184,7 @@ do_pgr_performanceAnalysis(
                     log,
                     only_cost);
         } else {
-            log << "Working with Undirected Graph\n";
+            //log << "Working with Undirected Graph\n";
             pgrouting::UndirectedGraph undigraph(gType);
             start_t = clock();
             undigraph.insert_edges(data_edges, total_edges);
@@ -202,6 +212,8 @@ do_pgr_performanceAnalysis(
         (*return_tuples) = pgr_alloc(count, (*return_tuples));
         for (size_t i = 0; i < count; i++) {
             *((*return_tuples) + i) = performance_details[i];
+            log << ((*return_tuples) + i)->source << ", " << ((*return_tuples) + i)->target
+            << ", " << ((*return_tuples) + i)->path_len << std::endl;
         }
         (*return_count) = count;
 
