@@ -125,12 +125,14 @@ bool Pgr_linear<G>::is_linear(G &graph, V v) {
     }
     /*
     Just taking simple cases, where we are sure that the number of edges decrease
-
+    'm' in edges
+    'n' out edges
+    Add a shortcut
     */
     auto adjacent_vertices = graph.find_adjacent_vertices(v);
     if (adjacent_vertices.size() == 2) {
-        if (graph.in_degree(v) > 0 && graph.in_degree(v) <= 2 &&
-            graph.out_degree(v) > 0 && graph.out_degree(v) <= 2) {
+        if (graph.in_degree(v) > 0 && 
+            graph.out_degree(v) > 0) {
             return true;
         }
     }
@@ -262,12 +264,19 @@ void Pgr_linear<G>::doContraction(G &graph, std::ostringstream& debug) {
 
 
         if (graph.m_gType == DIRECTED) {
+
+
+            /*
+            Adding edge for every in edge and every out edge
+            */
             for (boost::tie(in, in_end) = boost::in_edges(current_vertex, graph.graph);
                     in != in_end; ++in) {
                 for (boost::tie(out, out_end) = boost::out_edges(current_vertex, graph.graph);
                         out != out_end; ++out) {
                     //append_shortcut(graph, current_vertex, *in, *out, shortcuts, debug);
-                    
+                    if (graph.source(*in) == graph.target(*out)) {
+                        continue;
+                    }
                     add_shortcut(graph, current_vertex, *in, *out, debug);
                 }       
             }
@@ -331,23 +340,24 @@ void Pgr_linear<G>::add_shortcut(
         E incoming_edge,
         E outgoing_edge,
         std::ostringstream& debug) {
-    //pgassert(incoming_edge != outgoing_edge);
+    /*pgassert(incoming_edge != outgoing_edge);
     auto in_vertex = graph.adjacent(vertex, incoming_edge);
     auto out_vertex = graph.adjacent(vertex, outgoing_edge);
-    /*
+    
     pgassert(in_vertex != vertex);
     pgassert(in_vertex != out_vertex);
     pgassert(vertex != out_vertex);
-    */
+    
     if (in_vertex == vertex ||
         in_vertex == out_vertex ||
         vertex == out_vertex || 
         incoming_edge == outgoing_edge)
         return;
+    */
     CH_edge shortcut(
             get_next_id(),
-            graph[in_vertex].id,
-            graph[out_vertex].id,
+            graph[graph.source(incoming_edge)].id,
+            graph[graph.target(outgoing_edge)].id,
             graph[incoming_edge].cost + graph[outgoing_edge].cost);
 
 
