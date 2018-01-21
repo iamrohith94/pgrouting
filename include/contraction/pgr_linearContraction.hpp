@@ -235,16 +235,20 @@ void Pgr_linear<G>::doContraction(G &graph, std::ostringstream& debug) {
     }
 
 #ifndef NDEBUG
+    #if 0
     debug << "Linear vertices" << std::endl;
     for (V v : linearVertices) {
         debug << graph[v].id << ", ";
     }
     debug << std::endl;
+    #endif
 #endif
 
     shortcuts.clear();
     while (!linearPriority.empty()) {
         V current_vertex = linearPriority.top();
+	debug << "Remaining linear vertex count: " << linearPriority.size() << std::endl;
+	debug << "Current linear vertex: " << graph[current_vertex].id << std::endl;
         linearPriority.pop();
 
         if (!is_linear(graph, current_vertex)) {
@@ -261,10 +265,12 @@ void Pgr_linear<G>::doContraction(G &graph, std::ostringstream& debug) {
         adjacent_vertices.pop_front();
 
 #ifndef NDEBUG
+	#if 0
         debug << "Adjacent vertices\n";
         debug << graph[vertex_1].id
             << ", " << graph[vertex_2].id
             << std::endl;
+	#endif
 #endif
 
 
@@ -303,12 +309,12 @@ void Pgr_linear<G>::doContraction(G &graph, std::ostringstream& debug) {
             #endif
         }
 
-        debug << "Disconnecting vertex "  << std::endl;
+        //debug << "Disconnecting vertex "  << std::endl;
 
         graph.disconnect_vertex(current_vertex);
         graph[current_vertex].clear_contracted_vertices();
 
-        debug << "After removing vertex the graph is: " << graph << std::endl;
+        //debug << "After removing vertex the graph is: " << graph << std::endl;
         //add_shortcuts(graph, shortcuts);
 
 
@@ -371,7 +377,7 @@ void Pgr_linear<G>::add_shortcut(
     shortcut.add_contracted_edge_vertices(graph[outgoing_edge]);
 
     
-    debug << "Adding shortcut\n" << shortcut << std::endl;
+    //debug << "Adding shortcut\n" << shortcut << std::endl;
     graph.add_shortcut(shortcut);
 }
 

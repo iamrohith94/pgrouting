@@ -72,7 +72,7 @@ class Pgr_contract {
         linearContractor.setForbiddenVertices(forbidden_vertices);
         linearContractor.calculateVertices(graph, debug);
         try {
-            //linearContractor.doContraction(graph, debug);
+            linearContractor.doContraction(graph, debug);
         }
         catch ( ... ) {
             debug << "Caught unknown exception!\n";
