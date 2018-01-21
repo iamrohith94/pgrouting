@@ -1,43 +1,55 @@
-
-
-/*
-\echo --q0 Checking for valid contraction
+--q1 Checking dead end contraction for a graph with no dead end vertex
 SELECT * FROM pgr_contractGraph(
-    'SELECT id, source, target, cost, reverse_cost FROM edge_table WHERE id = 1',
-    ARRAY[-1]::integer[], 1, ARRAY[]::BIGINT[], true);
-
--- \echo --q0 -------------------------------------------
-
-\echo --q1 Checking dead end contraction for single edge
-SELECT * FROM pgr_contractGraph(
-    'SELECT id, source, target, cost, reverse_cost FROM edge_table WHERE id = 1',
+    'SELECT id, source, target, cost, reverse_cost FROM edge_table 
+    WHERE id = ANY(ARRAY[2, 4, 5, 8])',
     ARRAY[1]::integer[], 1, ARRAY[]::BIGINT[], true);
--- \echo --q1 -------------------------------------------
+--q1 -------------------------------------------
 
-\echo --q2 Checking dead end contraction for two edges
+--q2 Checking dead end contraction for a graph with dead start
 SELECT * FROM pgr_contractGraph(
-    'SELECT id, source, target, cost, reverse_cost FROM edge_table WHERE id < 3',
+    'SELECT id, source, target, cost, reverse_cost FROM edge_table 
+    WHERE id = 12',
     ARRAY[1]::integer[], 1, ARRAY[]::BIGINT[], true);
--- \echo --q2 -------------------------------------------
+--q2 -------------------------------------------
 
-\echo --q3 Checking dead end contraction for sample data
+--q3 Checking dead end contraction for a graph with base case dead end
 SELECT * FROM pgr_contractGraph(
-    'SELECT id, source, target, cost, reverse_cost FROM edge_table',
+    'SELECT id, source, target, cost, reverse_cost FROM edge_table 
+    WHERE id = 2',
     ARRAY[1]::integer[], 1, ARRAY[]::BIGINT[], true);
--- \echo --q3 -------------------------------------------
-*/
-/*
--- this test fails becuse parameter is wrong
-\echo --q4 Checking that forbidden vertices can only be one dimensional or empty
+--q3 -------------------------------------------
+
+--q4 Checking dead end contraction for a graph with dead end(bidirectional)
 SELECT * FROM pgr_contractGraph(
-	'SELECT id, source, target, cost, reverse_cost FROM edge_table WHERE id = 1',
-	ARRAY[ [2,3,4,5], [4,5,6,7] ]::BIGINT[][], ARRAY[0]::integer[], 1, true);
--- \echo --q4 -------------------------------------------
-*/
+    'SELECT id, source, target, cost, reverse_cost FROM edge_table 
+    WHERE id = 8',
+    ARRAY[1]::integer[], 1, ARRAY[]::BIGINT[], true);
+--q4 -------------------------------------------
 
-\echo --q5 Checking dead end contraction for a graph with no dead end vertex
-select * from pgr_contractgraph
-('select id, source, target, cost, reverse_cost from edge_table where id =any( ARRAY[2, 4, 5, 8, 10, 11, 12])'
-    , ARRAY[1]);
+--q5 Checking dead end contraction for a graph with multiple dead starts
+SELECT * FROM pgr_contractGraph(
+    'SELECT id, source, target, cost, reverse_cost FROM edge_table 
+    WHERE id = ANY(ARRAY[11, 12])',
+    ARRAY[1]::integer[], 1, ARRAY[]::BIGINT[], true);
+--q5 -------------------------------------------
 
--- \echo --q5 -------------------------------------------
+--q6 Checking dead end contraction for a graph with multiple dead ends
+SELECT * FROM pgr_contractGraph(
+    'SELECT id, source, target, cost, reverse_cost FROM edge_table 
+    WHERE id = ANY(ARRAY[2, 3])',
+    ARRAY[1]::integer[], 1, ARRAY[]::BIGINT[], true);
+--q6 -------------------------------------------
+
+--q7 Checking dead end contraction for a graph with multiple dead ends(bidirectional)
+SELECT * FROM pgr_contractGraph(
+    'SELECT id, source, target, cost, reverse_cost FROM edge_table 
+    WHERE id = ANY(ARRAY[6, 7, 8, 9])',
+    ARRAY[1]::integer[], 1, ARRAY[]::BIGINT[], true);
+--q7 -------------------------------------------
+
+--q8 Checking dead end contraction for a graph with multiple dead ends(bidirectional) with forbidden vertices
+SELECT * FROM pgr_contractGraph(
+    'SELECT id, source, target, cost, reverse_cost FROM edge_table 
+    WHERE id = ANY(ARRAY[6, 7, 8, 9])',
+    ARRAY[1]::integer[], 1, ARRAY[5,6]::BIGINT[], true);
+--q8 -------------------------------------------
