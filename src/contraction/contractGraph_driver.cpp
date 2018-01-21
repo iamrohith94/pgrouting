@@ -85,8 +85,10 @@ static void process_contraction(
     }
 
 #ifndef NDEBUG
+    #if 0
     log << "Before contraction\n";
     graph.print_graph(log);
+    #endif
 #endif
 
     /*
@@ -101,10 +103,10 @@ static void process_contraction(
             log);
 
 #ifndef NDEBUG
-     
+    #if 0 
     log << "After contraction\n";
     log << graph;
-    #if 0
+    
     log << "Remaining Vertices:" << "\n";
     for (const auto vertex : remaining_vertices) {
         log << vertex << "\n";
@@ -240,6 +242,7 @@ do_pgr_contractGraph(
         //std::vector< pgrouting::CH_edge > shortcut_edges;
 
 #ifndef NDEBUG
+        #if 0
         log << "Original Graph: \n" <<
             std::setprecision(32);
         for (const auto edge : edges) {
@@ -250,6 +253,7 @@ do_pgr_contractGraph(
                 << "\treverse_cost = " << edge.reverse_cost
                 << ")\n";
         }
+        #endif
         log << "size_contraction_order " << ordering.size() << "\n";
         log << "contraction_order: " <<"{ ";
         for (const auto o : ordering) {

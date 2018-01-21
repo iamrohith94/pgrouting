@@ -72,7 +72,7 @@ class Pgr_contract {
         linearContractor.setForbiddenVertices(forbidden_vertices);
         linearContractor.calculateVertices(graph, debug);
         try {
-            linearContractor.doContraction(graph, debug);
+            //linearContractor.doContraction(graph, debug);
         }
         catch ( ... ) {
             debug << "Caught unknown exception!\n";
@@ -112,31 +112,39 @@ class Pgr_contract {
                             << " asked" << "\n";
                         if (front == 1) {
 #ifndef NDEBUG
+                            #if 0
                             debug << "Graph before dead end contraction"
                                 << "\n";
                             graph.print_graph(debug);
+                            #endif
                             debug << "Performing dead end contraction"
                                 << "\n";
 #endif
                             perform_deadEnd(graph, forbidden_vertices, debug);
 #ifndef NDEBUG
+                            #if 0
                             debug << "Graph after dead end contraction"
                                 << "\n";
                             graph.print_graph(debug);
+                            #endif
 #endif
                         } else if (front == 2) {
 #ifndef NDEBUG
+                            #if 0
                             debug << "Graph before linear contraction"
                                 << "\n";
                             graph.print_graph(debug);
+                            #endif
                             debug << "Performing linear contraction"
                                 << "\n";
 #endif
                             perform_linear(graph, forbidden_vertices, debug);
 #ifndef NDEBUG
+                            #if 0
                             debug << "Graph after linear contraction"
                                 << "\n";
                             graph.print_graph(debug);
+                            #endif
 #endif
                         }
                         contract_order.pop_front();

@@ -152,17 +152,22 @@ void Pgr_linear<G>::calculateVertices(G &graph, std::ostringstream& debug) {
             vi != vertices(graph.graph).second;
             ++vi) {
 #ifndef NDEBUG
-        debug << "Checking vertex " << graph[(*vi)].id << '\n';
+        //debug << "Checking vertex " << graph[(*vi)].id << '\n';
 #endif
         if (is_linear(graph, *vi)) {
 
 #ifndef NDEBUG
-            debug << "Adding " << graph[(*vi)].id << " to linear" << '\n';
+            //debug << "Adding " << graph[(*vi)].id << " to linear" << '\n';
 #endif
             linearVertices += (*vi);
         }
     }
     linearVertices -= forbiddenVertices;
+
+#ifndef NDEBUG
+            debug << "Number of linear vertices: " << linearVertices.size() << '\n';
+#endif
+
 }
 
 
