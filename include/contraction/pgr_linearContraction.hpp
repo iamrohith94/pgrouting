@@ -320,13 +320,16 @@ void Pgr_linear<G>::doContraction(G &graph, std::ostringstream& debug) {
 
         linearVertices -= current_vertex;
         if (is_linear(graph, vertex_1)
-                && !forbiddenVertices.has(vertex_1)) {
+                && !forbiddenVertices.has(vertex_1) && !linearVertices.has(vertex_1)) {
+
+            debug << "Adding linear vertex: " << graph[vertex_1].id << std::endl;
             linearPriority.push(vertex_1);
             linearVertices += vertex_1;
         }
         if (is_linear(graph, vertex_2)
-                && !forbiddenVertices.has(vertex_2)) {
+                && !forbiddenVertices.has(vertex_2) && !linearVertices.has(vertex_2)) {
             linearPriority.push(vertex_2);
+            debug << "Adding linear vertex: " << graph[vertex_2].id << std::endl;
             linearVertices += vertex_2;
         }
     }
@@ -377,7 +380,7 @@ void Pgr_linear<G>::add_shortcut(
     shortcut.add_contracted_edge_vertices(graph[outgoing_edge]);
 
     
-    //debug << "Adding shortcut\n" << shortcut << std::endl;
+    debug << "Adding shortcut\n" << shortcut << std::endl;
     graph.add_shortcut(shortcut);
 }
 
