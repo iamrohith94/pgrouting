@@ -1,3 +1,4 @@
+
 --q1 Checking for linear contraction with no linear vertices
 SELECT * FROM pgr_contractGraph(
     'SELECT id, source, target, cost, reverse_cost FROM edge_table 
@@ -25,6 +26,7 @@ SELECT * FROM pgr_contractGraph(
     WHERE id = 3 OR id = 5 OR id = 11',
     ARRAY[2]::integer[], 1, ARRAY[]::BIGINT[], true);
 -- q4 -------------------------------------------
+
 
 -- q5 Checking linear contraction for two incoming and two outgoing and two linear nodes
 SELECT * FROM pgr_contractGraph(
