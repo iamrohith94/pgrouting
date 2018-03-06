@@ -40,6 +40,7 @@ CREATE OR REPLACE FUNCTION pgr_performanceAnalysis(
     OUT target BIGINT,
     OUT num_edges BIGINT,
     OUT num_vertices BIGINT,
+    OUT edge_read_time FLOAT,
     OUT graph_build_time FLOAT,
     OUT avg_computation_time FLOAT,
     OUT path_len FLOAT)

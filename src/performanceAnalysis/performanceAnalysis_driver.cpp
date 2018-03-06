@@ -54,7 +54,7 @@ pgr_performanceAnalysis(
         std::vector<int64_t> sources,
         std::vector<int64_t> targets,
         size_t num_iterations,
-        double graph_build_time,
+        //double graph_build_time,
         std::ostringstream& log,
         bool only_cost = false) {
     clock_t start_t, end_t;
@@ -72,7 +72,7 @@ pgr_performanceAnalysis(
     */
 
     Pgr_dijkstra< G > fn_dijkstra;
-    temp.graph_build_time = graph_build_time;
+    //temp.graph_build_time = graph_build_time;
     temp.num_vertices = graph.num_vertices();
     temp.num_edges = boost::num_edges(graph.graph);
     for (size_t i = 0; i < sources.size(); ++i) {
@@ -92,12 +92,14 @@ pgr_performanceAnalysis(
             log << "size: " << path.size() << std::endl;
             path.recalculate_agg_cost();
             end_t = clock();
+            // Time in milliseconds
             temp.avg_computation_time += (double)(1000.0 * (end_t-start_t) / CLOCKS_PER_SEC);
             temp.path_len += path.tot_cost();
             path.clear();
         }
-        temp.avg_computation_time /= num_iterations;   
+        temp.avg_computation_time /= num_iterations; 
         temp.path_len /= num_iterations;
+        log << "Avg path computation time: " << temp.avg_computation_time << std::endl;
         log << "tot_cost: " << temp.path_len << std::endl;
         return_tuples.push_back(temp);
     }
@@ -165,12 +167,14 @@ do_pgr_performanceAnalysis(
             start_t = clock();
             digraph.insert_edges(data_edges, total_edges);
             end_t = clock();
+            // Time in milliseconds
             build_time = (double)(1000.0 * (end_t-start_t) / CLOCKS_PER_SEC);
+
             performance_details = pgr_performanceAnalysis(digraph,
                     start_vertices,
                     end_vertices,
                     num_iterations,
-                    build_time,
+                    //build_time,
                     log,
                     only_cost);
         } else {
@@ -185,10 +189,12 @@ do_pgr_performanceAnalysis(
                     start_vertices,
                     end_vertices,
                     num_iterations,
-                    build_time,
+                    //build_time,
                     log,
                     only_cost);
         }
+
+        log << "Time taken to build the graph: " << build_time << std::endl; 
 
         auto count = performance_details.size();
 
@@ -202,6 +208,7 @@ do_pgr_performanceAnalysis(
         (*return_tuples) = pgr_alloc(count, (*return_tuples));
         for (size_t i = 0; i < count; i++) {
             *((*return_tuples) + i) = performance_details[i];
+            ((*return_tuples) + i)->graph_build_time = build_time;
         }
         (*return_count) = count;
 

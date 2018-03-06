@@ -99,9 +99,18 @@ process(
     pgr_edge_t *edges = NULL;
     size_t total_edges = 0;
 
+    clock_t start_t, end_t;
+    double edge_read_time;
+    
+    start_t = clock();    
     pgr_get_edges(edges_sql, &edges, &total_edges);
-    PGR_DBG("Total %ld edges in query:", total_edges);
+    end_t = clock();
+    time_msg("reading edges: ", start_t, clock());
+    // Time in milliseconds
+    edge_read_time = (double)(1000.0 * (end_t-start_t) / CLOCKS_PER_SEC);;
 
+    PGR_DBG("Total %ld edges in query:", total_edges);
+    // PGR_DBG("Time taken to read edges: %f", edge_read_time);
     if (total_edges == 0) {
         PGR_DBG("No edges found");
         pgr_SPI_finish();
@@ -109,7 +118,7 @@ process(
     }
 
     PGR_DBG("Starting processing");
-    clock_t start_t = clock();
+    start_t = clock();
     char *log_msg = NULL;
     char *notice_msg = NULL;
     char *err_msg = NULL;
@@ -132,6 +141,11 @@ process(
 
     time_msg(" processing pgr_performanceAnalysis", start_t, clock());
     PGR_DBG("Returning %ld tuples", *result_count);
+
+    // Populating the edge read time
+    for (size_t i = 0; i < *result_count; i++) {
+        ((*result_tuples) + i)->edge_read_time = edge_read_time;
+    }
 
     if (err_msg) {
         if (*result_tuples) pfree(*result_tuples);
@@ -235,12 +249,12 @@ PGDLLEXPORT Datum performanceAnalysis(PG_FUNCTION_ARGS) {
     OUT time_taken FLOAT
          ***********************************************************************/
 
-        values = palloc(8 * sizeof(Datum));
-        nulls = palloc(8 * sizeof(bool));
+        values = palloc(9 * sizeof(Datum));
+        nulls = palloc(9 * sizeof(bool));
 
 
         size_t i;
-        for (i = 0; i < 8; ++i) {
+        for (i = 0; i < 9; ++i) {
             nulls[i] = false;
         }
 
@@ -250,9 +264,10 @@ PGDLLEXPORT Datum performanceAnalysis(PG_FUNCTION_ARGS) {
         values[2] = Int64GetDatum(result_tuples[funcctx->call_cntr].target);
         values[3] = Int64GetDatum(result_tuples[funcctx->call_cntr].num_edges);
         values[4] = Int64GetDatum(result_tuples[funcctx->call_cntr].num_vertices);
-        values[5] = Float8GetDatum(result_tuples[funcctx->call_cntr].graph_build_time);
-        values[6] = Float8GetDatum(result_tuples[funcctx->call_cntr].avg_computation_time);
-        values[7] = Float8GetDatum(result_tuples[funcctx->call_cntr].path_len);
+        values[5] = Float8GetDatum(result_tuples[funcctx->call_cntr].edge_read_time);
+        values[6] = Float8GetDatum(result_tuples[funcctx->call_cntr].graph_build_time);
+        values[7] = Float8GetDatum(result_tuples[funcctx->call_cntr].avg_computation_time);
+        values[8] = Float8GetDatum(result_tuples[funcctx->call_cntr].path_len);
         /**********************************************************************/
 
         tuple = heap_form_tuple(tuple_desc, values, nulls);
