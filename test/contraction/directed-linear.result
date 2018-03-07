@@ -4,52 +4,6 @@ SET client_min_messages TO NOTICE;
 SET
 SELECT * FROM pgr_contractGraph(
     'SELECT id, source, target, cost, reverse_cost FROM edge_table 
-    WHERE id = 11 OR id = 12',
-    ARRAY[2]::integer[], 1, ARRAY[]::BIGINT[], true);
- seq | type | id | contracted_vertices | source | target | cost 
------+------+----+---------------------+--------+--------+------
-(0 rows)
-
-SELECT * FROM pgr_contractGraph(
-    'SELECT id, source, target, cost, reverse_cost FROM edge_table 
-    WHERE id = 2 OR id = 3',
-    ARRAY[2]::integer[], 1, ARRAY[]::BIGINT[], true);
- seq | type | id | contracted_vertices | source | target | cost 
------+------+----+---------------------+--------+--------+------
-   1 | e    | -2 | {3}                 |      4 |      2 |   2
-(1 row)
-
-SELECT * FROM pgr_contractGraph(
-    'SELECT id, source, target, cost, reverse_cost FROM edge_table 
-    WHERE id = 8 OR id = 9',
-    ARRAY[2]::integer[], 1, ARRAY[]::BIGINT[], true);
- seq | type | id | contracted_vertices | source | target | cost 
------+------+----+---------------------+--------+--------+------
-   1 | e    | -2 | {6}                 |      5 |      9 |   2
-   2 | e    | -3 | {6}                 |      9 |      5 |   2
-(2 rows)
-
-SELECT * FROM pgr_contractGraph(
-    'SELECT id, source, target, cost, reverse_cost FROM edge_table 
-    WHERE id = 3 OR id = 5 OR id = 11',
-    ARRAY[2]::integer[], 1, ARRAY[]::BIGINT[], true);
- seq | type | id | contracted_vertices | source | target | cost 
------+------+----+---------------------+--------+--------+------
-   1 | e    | -3 | {3,6}               |      4 |     11 |   3
-(1 row)
-
-SELECT * FROM pgr_contractGraph(
-    'SELECT id, source, target, cost, reverse_cost FROM edge_table 
-    WHERE id = 4 OR id = 8 OR id = 9',
-    ARRAY[2]::integer[], 1, ARRAY[]::BIGINT[], true);
- seq | type | id | contracted_vertices | source | target | cost 
------+------+----+---------------------+--------+--------+------
-   1 | e    | -5 | {5,6}               |      2 |      9 |   3
-   2 | e    | -4 | {5,6}               |      9 |      2 |   3
-(2 rows)
-
-SELECT * FROM pgr_contractGraph(
-    'SELECT id, source, target, cost, reverse_cost FROM edge_table 
     WHERE id = 4 OR id = 8 OR id = 9 OR id = 11 OR id = 13 OR id = 15 OR id = 16',
     ARRAY[2]::integer[], 1, ARRAY[]::BIGINT[], true);
  seq | type | id  | contracted_vertices | source | target | cost 
@@ -62,11 +16,13 @@ SELECT * FROM pgr_contractGraph(
 SELECT * FROM pgr_contractGraph(
     'SELECT id, source, target, cost, reverse_cost FROM edge_table 
     WHERE id = 4 OR id = 8 OR id = 9 OR id = 11 OR id = 13 OR id = 15 OR id = 16',
-    ARRAY[2]::integer[], 1, ARRAY[5,11]::BIGINT[], true);
- seq | type | id | contracted_vertices | source | target | cost 
------+------+----+---------------------+--------+--------+------
-   1 | e    | -2 | {12}                |     11 |      9 |   2
-(1 row)
+    ARRAY[2]::integer[], 1, ARRAY[7]::BIGINT[], true);
+ seq | type | id  | contracted_vertices | source | target | cost 
+-----+------+-----+---------------------+--------+--------+------
+   1 | e    | -10 | {5,6,9}             |      2 |      4 |    4
+   2 | e    | -11 | {5,6,9,11,12}       |      2 |      4 |    6
+   3 | e    |  -9 | {5,6,9}             |      4 |      2 |    4
+(3 rows)
 
 ROLLBACK;
 ROLLBACK
