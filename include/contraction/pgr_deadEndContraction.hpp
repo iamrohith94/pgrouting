@@ -134,7 +134,7 @@ bool Pgr_deadend<G>::is_dead_end(G &graph, V v) {
          @enddot
 
          */
-        Identifiers<V> adjacent_vertices = graph.find_adjacent_vertices(v);
+        Identifiers<V> adjacent_vertices = graph.get_adjacent_vertices(v);
         if (adjacent_vertices.size() == 1) {
             return true;
         }
@@ -313,7 +313,7 @@ bool Pgr_deadend<G>::is_dead_end(G &graph, V v) {
 
          */
 
-        auto adjacent_vertices = graph.find_adjacent_vertices(v);
+        auto adjacent_vertices = graph.get_adjacent_vertices(v);
         if (adjacent_vertices.size() == 1) {
             return true;
         }
@@ -351,7 +351,7 @@ Pgr_deadend<G>::doContraction(G &graph) {
         }
 
         Identifiers<V> adjacent_vertices =
-            graph.find_adjacent_vertices(current_vertex);
+            graph.get_adjacent_vertices(current_vertex);
 
         for (auto adjacent_vertex : adjacent_vertices) {
 #ifndef NDEBUG

@@ -94,7 +94,7 @@ class Pgr_contractionGraph : public Pgr_base_graph<G, T_V, T_E> {
        @param [in] v vertex_descriptor
        @return Identifiers<V>: The set of vertex descriptors adjacent to the given vertex *v*
        */
-     Identifiers<V> find_adjacent_vertices(V v) const {
+     Identifiers<V> get_adjacent_vertices(V v) const {
          EO_i out, out_end;
          EI_i in, in_end;
          Identifiers<V> adjacent_vertices;
@@ -108,6 +108,26 @@ class Pgr_contractionGraph : public Pgr_base_graph<G, T_V, T_E> {
              adjacent_vertices += this->adjacent(v, *in);
          }
          return adjacent_vertices;
+     }
+
+     /*! @brief get the edge descriptors of incident edge of *v*
+       @param [in] v vertex_descriptor
+       @return Identifiers<E>: The set of edge descriptors incident on the given vertex *v*
+       */
+     Identifiers<E> get_incident_edges(V v) const {
+         EO_i out, out_end;
+         EI_i in, in_end;
+         Identifiers<E> incident_edges;
+
+         for (boost::tie(out, out_end) = out_edges(v, this->graph);
+                 out != out_end; ++out) {
+             incident_edges += *out;
+         }
+         for (boost::tie(in, in_end) = in_edges(v, this->graph);
+                 in != in_end; ++in) {
+             incident_edges += *in;
+         }
+         return incident_edges;
      }
 
 

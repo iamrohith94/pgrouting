@@ -77,4 +77,5 @@ std::ostream& operator <<(std::ostream& os, const CH_edge& e) {
     return os;
 }
 
+
 }  // namespace pgrouting
