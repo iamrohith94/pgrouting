@@ -136,8 +136,6 @@ Experimental Functions
 
 .. rubric:: Graph Analysis
 
--  :ref:`pgr_labelGraph` - Analyze / label  subgraphs within a network
-
 :ref:`components` - Analyze components within a graph
 
 -  :ref:`pgr_connectedComponents` - Return the connected components of an undirected graph
@@ -157,7 +155,6 @@ Experimental Functions
 
   contraction-family
   flow-family
-  pgr_labelGraph
   components-family
   pgr_gsoc_vrppdtw
   pgr_vrpOneDepot
